@@ -224,19 +224,22 @@
     }
 
     function createTestButton(label, type, course) {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = `test-btn${type === 'post' ? ' test-btn--post' : ''}`;
-      button.setAttribute('aria-label', `${label} ${course.CourseName || ''}`);
-      button.append(
-        icon('<path d="M8 3h8l4 4v14H4V3h4zM14 3v5h5M8 13h8M8 17h5" stroke-linecap="round" stroke-linejoin="round"/>'),
-        document.createTextNode(label)
-      );
-      button.addEventListener('click', () => {
-        showToast('ระบบแบบทดสอบจะเปิดใช้งานใน Step ถัดไป', 'info');
-      });
-      return button;
-    }
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = `test-btn${type === 'post' ? ' test-btn--post' : ''}`;
+  button.setAttribute('aria-label', `${label} ${course.CourseName || ''}`);
+
+  button.append(
+    icon('<path d="M8 3h8l4 4v14H4V3h4zM14 3v5h5M8 13h8M8 17h5" stroke-linecap="round" stroke-linejoin="round"/>'),
+    document.createTextNode(label)
+  );
+
+  button.addEventListener('click', () => {
+    showToast('ระบบแบบทดสอบจะเปิดใช้งานใน Step ถัดไป', 'info');
+  });
+
+  return button;
+}
 
     function createCourseCard(course) {
       const date = parseCourseDate(course.Date);
