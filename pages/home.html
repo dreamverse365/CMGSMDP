@@ -697,43 +697,135 @@ async function loadUpcoming() {
 let historyLoaded = false;
 
 async function openHistory() {
-  document.getElementById('historyOverlay').classList.add('visible');
+  const overlay = document.getElementById('historyOverlay');
+  const list = document.getElementById('historyList');
+
+  overlay.classList.add('visible');
   document.body.style.overflow = 'hidden';
 
+  // โหลดสำเร็จแล้ว ไม่ต้องเรียก API ซ้ำ
   if (historyLoaded) return;
-  historyLoaded = true;
 
-  const list = document.getElementById('historyList');
-  list.innerHTML = '<div style="padding:20px 0;text-align:center;color:var(--text-3);font-size:13px;">กำลังโหลด...</div>';
+  list.innerHTML = `
+    <div style="
+      padding:20px 0;
+      text-align:center;
+      color:var(--text-3);
+      font-size:13px;">
+      กำลังโหลด...
+    </div>`;
 
-  const result = await api('getPointHistory', { empId: session.empId });
+  const result = await api('getPointHistory', {
+    empId: session.empId
+  });
 
-  if (!result.success || !result.history?.length) {
-    list.innerHTML = '<div class="empty-state"><p>ยังไม่มีประวัติ Point</p></div>';
+  console.log('Point History API:', result);
+
+  // แยก API Error ออกจากกรณีไม่มีข้อมูล
+  if (!result.success) {
+    historyLoaded = false;
+
+    list.innerHTML = `
+      <div class="empty-state">
+        <p>โหลดประวัติ Point ไม่สำเร็จ</p>
+        <small id="historyErrorMessage"></small>
+        <button
+          type="button"
+          class="btn"
+          style="margin-top:16px;"
+          onclick="openHistory()">
+          ลองใหม่
+        </button>
+      </div>`;
+
+    document.getElementById('historyErrorMessage').textContent =
+      result.message || 'ไม่สามารถเชื่อมต่อระบบได้';
+
     return;
   }
 
+  // API สำเร็จ แต่ไม่มีประวัติจริง
+  if (!Array.isArray(result.history) || result.history.length === 0) {
+    historyLoaded = true;
+
+    list.innerHTML = `
+      <div class="empty-state">
+        <p>ยังไม่มีประวัติ Point</p>
+      </div>`;
+
+    return;
+  }
+
+  historyLoaded = true;
+
   const iconMap = {
-    earn: `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 4v12M4 10l6-6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    redeem: `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 4v12M4 14l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    admin: `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="7"/><path d="M10 7v3l2 2" stroke-linecap="round"/></svg>`,
-    admin_edit: `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 3.5l2 2L7 15l-3 1 1-3 9.5-9.5z" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+    earn: `
+      <svg viewBox="0 0 20 20"
+           fill="none"
+           stroke="currentColor"
+           stroke-width="1.5">
+        <path d="M10 16V4M4 10l6-6 6 6"
+              stroke-linecap="round"
+              stroke-linejoin="round"/>
+      </svg>`,
+
+    redeem: `
+      <svg viewBox="0 0 20 20"
+           fill="none"
+           stroke="currentColor"
+           stroke-width="1.5">
+        <path d="M10 4v12M4 10l6 6 6-6"
+              stroke-linecap="round"
+              stroke-linejoin="round"/>
+      </svg>`,
+
+    admin: `
+      <svg viewBox="0 0 20 20"
+           fill="none"
+           stroke="currentColor"
+           stroke-width="1.5">
+        <circle cx="10" cy="10" r="7"/>
+        <path d="M10 7v3l2 2"
+              stroke-linecap="round"/>
+      </svg>`,
+
+    admin_edit: `
+      <svg viewBox="0 0 20 20"
+           fill="none"
+           stroke="currentColor"
+           stroke-width="1.5">
+        <path d="M14.5 3.5l2 2L7 15l-3 1 1-3 9.5-9.5z"
+              stroke-linecap="round"
+              stroke-linejoin="round"/>
+      </svg>`
   };
 
-  list.innerHTML = result.history.map(h => {
-    const ptNum = Number(h.Point);
-    const isPos = ptNum >= 0;
-    const icon = iconMap[h.Type] || iconMap.earn;
-    const iconClass = `history-icon--${h.Type || 'earn'}`;
+  list.innerHTML = result.history.map(item => {
+    const point = Number(item.Point) || 0;
+    const isPositive = point >= 0;
+    const type = item.Type || 'earn';
+    const icon = iconMap[type] || iconMap.earn;
+
     return `
       <div class="history-item">
-        <div class="history-icon ${iconClass}">${icon}</div>
-        <div class="history-info">
-          <div class="history-reason">${h.Reason}</div>
-          <div class="history-date">${formatDateTime(h.Date)}</div>
+        <div class="history-icon history-icon--${type}">
+          ${icon}
         </div>
-        <div class="history-pt ${isPos ? 'history-pt--pos' : 'history-pt--neg'}">
-          ${isPos ? '+' : ''}${ptNum}
+
+        <div class="history-info">
+          <div class="history-reason">
+            ${item.Reason || 'Point Transaction'}
+          </div>
+
+          <div class="history-date">
+            ${formatDateTime(item.Date)}
+          </div>
+        </div>
+
+        <div class="history-pt ${
+          isPositive ? 'history-pt--pos' : 'history-pt--neg'
+        }">
+          ${isPositive ? '+' : ''}${point}
         </div>
       </div>`;
   }).join('');
