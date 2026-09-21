@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>CMG SMDP — Home</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/app.css">
+  <style>
+
+    /* ── BG GLOW ──────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; top: -20%; left: -10%;
+      width: 60vw; height: 60vw;
+      background: radial-gradient(circle, rgba(201,168,76,0.05) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+
+    .page-body { position: relative; z-index: 1; }
+
+    /* ── HERO CARD ────────────────────────────── */
+    .hero-card {
+      background: linear-gradient(145deg, #16161f 0%, #1e1e2d 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* subtle grid texture */
+    .hero-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+    }
+
+    /* gold accent bar */
+    .hero-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 24px; right: 24px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.6;
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .hero-brand {
+      font-family: 'Manrope', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .hero-name {
+      font-family: 'Manrope', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.15;
+    }
+
+    .hero-sub {
+      font-size: 12px;
+      color: var(--text-2);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .hero-avatar {
+      width: 44px; height: 44px;
+      background: var(--gold-dim);
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-family: 'Manrope', sans-serif;
+      font-size: 16px; font-weight: 800;
+      color: var(--gold);
+    }
+
+    /* Point Display */
+    .point-display {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      position: relative;
+    }
+
+    .point-block {}
+    .point-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      color: var(--text-3);
+      margin-bottom: 4px;
+    }
+
+    .point-value {
+      font-family: 'Manrope', sans-serif;
+      font-size: 44px;
+      font-weight: 800;
+      color: var(--gold);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .point-unit {
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gold);
+      opacity: 0.7;
+      margin-left: 4px;
+      vertical-align: bottom;
+      line-height: 2;
+    }
+
+    .point-secondary {
+      text-align: right;
+    }
+
+    .point-secondary-item {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-bottom: 2px;
+      line-height: 1.5;
+    }
+
+    .point-secondary-item span {
+      color: var(--text-2);
+      font-weight: 500;
+    }
+
+    /* Progress bar */
+    .progress-wrap {
+      margin-top: 16px;
+      position: relative;
+    }
+
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-3);
+      margin-bottom: 6px;
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: var(--surface-3);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar__fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+      border-radius: 4px;
+      transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* History btn */
+    .history-btn {
+      display: flex; align-items: center; gap: 6px;
+      background: none; border: none; cursor: pointer;
+      color: var(--text-2); font-size: 12px;
+      padding: 4px 0; margin-top: 12px;
+      transition: color 0.2s;
+    }
+    .history-btn svg { width: 14px; height: 14px; }
+    .history-btn:hover { color: var(--gold); }
+
+    /* ── FLASH CARDS GRID ─────────────────────── */
+    .flashcard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .flashcard {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px 18px;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex; flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .flashcard::before {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .flashcard:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    }
+    .flashcard:hover::before { opacity: 1; }
+    .flashcard:active { transform: scale(0.97); }
+
+    /* individual card accents */
+    .flashcard--calendar .flashcard__icon-wrap { background: rgba(91,156,246,0.12); }
+    .flashcard--calendar .flashcard__icon { color: #5b9cf6; }
+
+    .flashcard--ranking .flashcard__icon-wrap  { background: var(--gold-dim); }
+    .flashcard--ranking .flashcard__icon  { color: var(--gold); }
+
+    .flashcard--redeem .flashcard__icon-wrap  { background: rgba(76,175,130,0.1); }
+    .flashcard--redeem .flashcard__icon  { color: #4caf82; }
+
+    .flashcard--profile .flashcard__icon-wrap  { background: rgba(180,100,246,0.1); }
+    .flashcard--profile .flashcard__icon  { color: #b464f6; }
+
+    .flashcard__icon-wrap {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .flashcard__icon { width: 20px; height: 20px; }
+
+    .flashcard__label {
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .flashcard__sub {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    /* ── UPCOMING SECTION ─────────────────────── */
+    .upcoming-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .upcoming-item {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+
+    .upcoming-item:last-child { border-bottom: none; }
+    .upcoming-item:hover { background: var(--surface-2); }
+
+    .upcoming-date-block {
+      width: 40px; flex-shrink: 0;
+      text-align: center;
+    }
+
+    .upcoming-date-day {
+      font-family: 'Manrope', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .upcoming-date-month {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      margin-top: 2px;
+    }
+
+    .upcoming-vline {
+      width: 1px; height: 36px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .upcoming-info { flex: 1; min-width: 0; }
+
+    .upcoming-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .upcoming-meta {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 3px;
+    }
+
+    .upcoming-format {
+      display: inline-flex;
+      padding: 2px 8px;
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .upcoming-format--classroom {
+      background: rgba(91,156,246,0.12);
+      color: #5b9cf6;
+    }
+
+    .upcoming-format--online {
+      background: rgba(76,175,130,0.12);
+      color: #4caf82;
+    }
+
+    /* ── POINT HISTORY BOTTOM SHEET ───────────── */
+    .history-list { display: flex; flex-direction: column; gap: 0; }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .history-item:last-child { border-bottom: none; }
+
+    .history-icon {
+      width: 36px; height: 36px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .history-icon svg { width: 16px; height: 16px; }
+
+    .history-icon--earn   { background: rgba(76,175,130,0.12);  color: #4caf82; }
+    .history-icon--redeem { background: rgba(201,168,76,0.12);  color: var(--gold); }
+    .history-icon--admin, .history-icon--admin_edit  { background: rgba(91,156,246,0.12);  color: #5b9cf6; }
+
+    .history-info { flex: 1; min-width: 0; }
+    .history-reason {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .history-date {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 2px;
+    }
+
+    .history-pt {
+      font-family: 'Manrope', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .history-pt--pos { color: #4caf82; }
+    .history-pt--neg { color: var(--gold); }
+
+    .sheet-title {
+      font-family: 'Manrope', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    /* ── LOADING SKELETONS ────────────────────── */
+    .sk-name  { width: 140px; height: 22px; margin-bottom: 6px; }
+    .sk-sub   { width: 100px; height: 14px; }
+    .sk-pt    { width: 80px;  height: 44px; margin-bottom: 4px; }
+    .sk-bar   { width: 100%;  height: 4px; margin-top: 16px; }
+
+  </style>
+</head>
+<body>
+
+<!-- ── PAGE HEADER ─────────────────────────────── -->
+<header class="page-header">
+  <div>
+    <div style="font-size:9px;letter-spacing:0.2em;color:var(--gold);font-weight:700;font-family:'Manrope',sans-serif;">CMG</div>
+    <div style="font-family:'Manrope',sans-serif;font-size:13px;font-weight:800;letter-spacing:0.1em;">SMDP</div>
+  </div>
+  <button onclick="logout()" style="background:none;border:none;cursor:pointer;color:var(--text-3);display:flex;align-items:center;gap:6px;font-size:12px;transition:color 0.2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-3)'">
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M13 3h4a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-4M9 14l4-4-4-4M13 10H3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    ออกจากระบบ
+  </button>
+</header>
+
+<!-- ── MAIN CONTENT ────────────────────────────── -->
+<main class="page-body">
+
+  <!-- Hero / Profile + Points Card -->
+  <div class="hero-card" id="heroCard">
+    <div class="hero-top">
+      <div>
+        <div class="hero-brand" id="heroBrand">LOADING...</div>
+        <div class="hero-name" id="heroName">
+          <span class="skeleton sk-name" style="display:block"></span>
+        </div>
+        <div class="hero-sub" id="heroSub">
+          <span class="skeleton sk-sub" style="display:block;margin-top:6px"></span>
+        </div>
+      </div>
+      <div class="hero-avatar" id="heroAvatar">?</div>
+    </div>
+
+    <div class="point-display">
+      <div class="point-block">
+        <div class="point-label">POINTS สะสม</div>
+        <div>
+          <span class="point-value" id="totalPoint">—</span>
+          <span class="point-unit">pts</span>
+        </div>
+      </div>
+      <div class="point-secondary">
+        <div class="point-secondary-item">ใช้แลกได้ <span id="availPoint">—</span> pts</div>
+        <div class="point-secondary-item">แลกไปแล้ว <span id="redeemPoint">—</span> pts</div>
+      </div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-labels">
+        <span>Journey Progress</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-bar__fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <button class="history-btn" onclick="openHistory()">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="10" cy="10" r="8"/>
+        <path d="M10 6v4l2.5 2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      ดูประวัติ Point
+    </button>
+  </div>
+
+  <!-- Flash Cards -->
+  <p class="section-label">เมนู</p>
+  <div class="flashcard-grid">
+
+    <a class="flashcard flashcard--calendar" href="calendar.html">
+      <div class="flashcard__icon-wrap">
+        <svg class="flashcard__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="4" width="18" height="18" rx="3"/>
+          <path d="M16 2v4M8 2v4M3 10h18" stroke-linecap="round"/>
+          <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01" stroke-linecap="round" stroke-width="2"/>
+        </svg>
+      </div>
+      <div>
+        <div class="flashcard__label">Calendar</div>
+        <div class="flashcard__sub">ตารางอบรม & แบบทดสอบ</div>
+      </div>
+    </a>
+
+    <a class="flashcard flashcard--ranking" href="ranking.html">
+      <div class="flashcard__icon-wrap">
+        <svg class="flashcard__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        </svg>
+      </div>
+      <div>
+        <div class="flashcard__label">Ranking</div>
+        <div class="flashcard__sub">Top 10 คะแนนสูงสุด</div>
+      </div>
+    </a>
+
+    <a class="flashcard flashcard--redeem" href="redeem.html">
+      <div class="flashcard__icon-wrap">
+        <svg class="flashcard__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7M22 7H2v5h20V7zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="flashcard__label">Redeem</div>
+        <div class="flashcard__sub">แลก Gift Card</div>
+      </div>
+    </a>
+
+    <a class="flashcard flashcard--profile" href="profile.html">
+      <div class="flashcard__icon-wrap">
+        <svg class="flashcard__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="flashcard__label">โปรไฟล์</div>
+        <div class="flashcard__sub">ข้อมูลส่วนตัว</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- Upcoming Courses -->
+  <p class="section-label">หลักสูตรที่กำลังจะมาถึง</p>
+  <div class="upcoming-card" id="upcomingList">
+    <!-- populated by JS -->
+    <div class="upcoming-item">
+      <div class="skeleton" style="width:40px;height:40px;border-radius:8px;flex-shrink:0"></div>
+      <div style="flex:1"><div class="skeleton" style="width:70%;height:13px;margin-bottom:6px"></div><div class="skeleton" style="width:50%;height:11px"></div></div>
+    </div>
+    <div class="upcoming-item">
+      <div class="skeleton" style="width:40px;height:40px;border-radius:8px;flex-shrink:0"></div>
+      <div style="flex:1"><div class="skeleton" style="width:60%;height:13px;margin-bottom:6px"></div><div class="skeleton" style="width:40%;height:11px"></div></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── BOTTOM NAV ──────────────────────────────── -->
+<nav class="bottom-nav">
+  <a class="nav-item active" href="home.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M3 12L12 3l9 9" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M9 21V12h6v9" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="nav-item__label">หน้าหลัก</span>
+  </a>
+  <a class="nav-item" href="calendar.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <rect x="3" y="4" width="18" height="18" rx="3"/>
+      <path d="M16 2v4M8 2v4M3 10h18" stroke-linecap="round"/>
+    </svg>
+    <span class="nav-item__label">ตาราง</span>
+  </a>
+  <a class="nav-item" href="ranking.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M18 20V10M12 20V4M6 20v-6" stroke-linecap="round"/>
+    </svg>
+    <span class="nav-item__label">Ranking</span>
+  </a>
+  <a class="nav-item" href="redeem.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7M22 7H2v5h20V7zM12 22V7"/>
+    </svg>
+    <span class="nav-item__label">Redeem</span>
+  </a>
+</nav>
+
+<!-- ── HISTORY BOTTOM SHEET ────────────────────── -->
+<div class="overlay" id="historyOverlay" onclick="closeHistory(event)">
+  <div class="bottom-sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <h3 class="sheet-title">ประวัติ Point</h3>
+    <div class="history-list" id="historyList">
+      <!-- populated by JS -->
+    </div>
+  </div>
+</div>
+
+<script src="../js/config.js"></script>
+<script>
+const MAX_PROG = 300;
+
+const MONTH_TH = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+function formatDate(isoStr) {
+  const d = new Date(isoStr);
+  return `${d.getDate()} ${MONTH_TH[d.getMonth()]} ${d.getFullYear() + 543}`;
+}
+
+function formatDateTime(isoStr) {
+  const d = new Date(isoStr);
+  return `${d.getDate()} ${MONTH_TH[d.getMonth()]} ${d.getFullYear() + 543}  ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+// ── Auth guard ──
+const session = Session.require();
+
+// ── Populate hero from session (instant) ──
+function renderHero(user) {
+  const initial = (user.firstname || '?')[0].toUpperCase();
+  document.getElementById('heroAvatar').textContent = initial;
+  document.getElementById('heroBrand').textContent = (user.brandName || '') + ' · ' + (user.workLocation || '');
+  document.getElementById('heroName').textContent = user.firstname + ' ' + user.lastname;
+  document.getElementById('heroSub').textContent = user.functionName || '';
+
+  const total = Number(user.totalPoint) || 0;
+  const avail = Number(user.availablePoint) || 0;
+  const redeem = total - avail;
+  const pct = Math.min(Math.round((total / MAX_PROG) * 100), 100);
+
+  document.getElementById('totalPoint').textContent = total.toLocaleString();
+  document.getElementById('availPoint').textContent = avail.toLocaleString();
+  document.getElementById('redeemPoint').textContent = redeem.toLocaleString();
+  document.getElementById('progressPct').textContent = pct + '%';
+
+  // animate bar after paint
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      document.getElementById('progressFill').style.width = pct + '%';
+    }, 100);
+  });
+}
+
+renderHero(session);
+
+// ── Refresh profile from API ──
+async function refreshProfile() {
+  const result = await api('getUserProfile', { empId: session.empId });
+  if (result.success) {
+    // Update session
+    Object.assign(session, result.user);
+    Session.save(session);
+    renderHero(result.user);
+  }
+}
+
+// ── Load upcoming courses ──
+async function loadUpcoming() {
+  const result = await api('getCourses');
+  const container = document.getElementById('upcomingList');
+
+  if (!result.success || !result.courses?.length) {
+    container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18" stroke-linecap="round"/></svg><p>ยังไม่มีหลักสูตร</p></div>';
+    return;
+  }
+
+  const now = new Date();
+  // Sort upcoming first
+  const upcoming = result.courses
+    .filter(c => new Date(c.Date) >= now)
+    .sort((a, b) => new Date(a.Date) - new Date(b.Date))
+    .slice(0, 3);
+
+  if (!upcoming.length) {
+    container.innerHTML = '<div class="empty-state"><p>ไม่มีหลักสูตรที่กำลังจะมาถึง</p></div>';
+    return;
+  }
+
+  container.innerHTML = upcoming.map(c => {
+    const d = new Date(c.Date);
+    const day = d.getDate();
+    const month = MONTH_TH[d.getMonth()];
+    const fmtClass = c.Format === 'online' ? 'upcoming-format--online' : 'upcoming-format--classroom';
+    const fmtLabel = c.Format === 'online' ? 'Online' : 'Classroom';
+    return `
+      <div class="upcoming-item">
+        <div class="upcoming-date-block">
+          <div class="upcoming-date-day">${day}</div>
+          <div class="upcoming-date-month">${month}</div>
+        </div>
+        <div class="upcoming-vline"></div>
+        <div class="upcoming-info">
+          <div class="upcoming-name">${c.CourseName}</div>
+          <div class="upcoming-meta">${c.Time || ''} · ${c.Location || ''}</div>
+        </div>
+        <span class="upcoming-format ${fmtClass}">${fmtLabel}</span>
+      </div>`;
+  }).join('');
+}
+
+// ── Point History ──
+let historyLoaded = false;
+
+async function openHistory() {
+  document.getElementById('historyOverlay').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+
+  if (historyLoaded) return;
+  historyLoaded = true;
+
+  const list = document.getElementById('historyList');
+  list.innerHTML = '<div style="padding:20px 0;text-align:center;color:var(--text-3);font-size:13px;">กำลังโหลด...</div>';
+
+  const result = await api('getPointHistory', { empId: session.empId });
+
+  if (!result.success || !result.history?.length) {
+    list.innerHTML = '<div class="empty-state"><p>ยังไม่มีประวัติ Point</p></div>';
+    return;
+  }
+
+  const iconMap = {
+    earn: `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 4v12M4 10l6-6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    redeem: `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 4v12M4 14l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    admin: `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="7"/><path d="M10 7v3l2 2" stroke-linecap="round"/></svg>`,
+    admin_edit: `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 3.5l2 2L7 15l-3 1 1-3 9.5-9.5z" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+  };
+
+  list.innerHTML = result.history.map(h => {
+    const ptNum = Number(h.Point);
+    const isPos = ptNum >= 0;
+    const icon = iconMap[h.Type] || iconMap.earn;
+    const iconClass = `history-icon--${h.Type || 'earn'}`;
+    return `
+      <div class="history-item">
+        <div class="history-icon ${iconClass}">${icon}</div>
+        <div class="history-info">
+          <div class="history-reason">${h.Reason}</div>
+          <div class="history-date">${formatDateTime(h.Date)}</div>
+        </div>
+        <div class="history-pt ${isPos ? 'history-pt--pos' : 'history-pt--neg'}">
+          ${isPos ? '+' : ''}${ptNum}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function closeHistory(e) {
+  document.getElementById('historyOverlay').classList.remove('visible');
+  document.body.style.overflow = '';
+}
+
+function logout() {
+  if (confirm('ออกจากระบบ?')) {
+    Session.clear();
+    window.location.href = '../index.html';
+  }
+}
+
+// ── Init ──
+refreshProfile();
+loadUpcoming();
+</script>
+</body>
+</html>
