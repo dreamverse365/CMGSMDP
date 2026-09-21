@@ -1,8 +1,8 @@
 // ============================================================
-//  CMG SMDP — Global Config
+//  CMG SMDP โ€” Global Config
 // ============================================================
 const CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbx3prMp9Zl_owDdD_47ftD3_zIRRL2shG2JT_Ihwk4eOv5nUuSbXS6z97ZUIeekDonbng/exec',  // <-- ใส่ GAS Web App URL หลัง deploy
+  API_URL: 'https://script.google.com/macros/s/AKfycbx3prMp9Zl_owDdD_47ftD3_zIRRL2shG2JT_Ihwk4eOv5nUuSbXS6z97ZUIeekDonbng/exec',
   PROJECT_NAME: 'CMG STORE MANAGER',
   PROJECT_SUBTITLE: 'DEVELOPMENT PROGRAM',
   SESSION_KEY: 'cmg_smdp_session',
@@ -22,15 +22,24 @@ const Session = {
   get() {
     const raw = localStorage.getItem(CONFIG.SESSION_KEY);
     if (!raw) return null;
-    const data = JSON.parse(raw);
-    const loginTime = new Date(data.loginTime);
-    const now = new Date();
-    const hours = (now - loginTime) / (1000 * 60 * 60);
-    if (hours > CONFIG.SESSION_EXPIRE_HOURS) {
+
+    try {
+      const data = JSON.parse(raw);
+      const loginTime = new Date(data.loginTime);
+      const now = new Date();
+      const hours = (now - loginTime) / (1000 * 60 * 60);
+
+      if (!data.loginTime || Number.isNaN(loginTime.getTime()) ||
+          hours > CONFIG.SESSION_EXPIRE_HOURS) {
+        this.clear();
+        return null;
+      }
+
+      return data;
+    } catch (error) {
       this.clear();
       return null;
     }
-    return data;
   },
 
   clear() {
@@ -38,25 +47,53 @@ const Session = {
   },
 
   require() {
-    const s = this.get();
-    if (!s) {
-      window.location.href = 'index.html';
+    const session = this.get();
+
+    if (!session) {
+      const isInsidePages = window.location.pathname
+        .toLowerCase()
+        .includes('/pages/');
+
+      window.location.replace(
+        isInsidePages ? '../index.html' : 'index.html'
+      );
+
       return null;
     }
-    return s;
+
+    return session;
   }
 };
 
 // ---------- API Helper ----------
 async function api(action, body = {}) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
   try {
-    const res = await fetch(CONFIG.API_URL, {
+    const response = await fetch(CONFIG.API_URL, {
       method: 'POST',
-      body: JSON.stringify({ action, ...body })
+      body: JSON.stringify({ action, ...body }),
+      signal: controller.signal
     });
-    return await res.json();
-  } catch (err) {
-    return { success: false, message: 'เชื่อมต่อระบบไม่ได้ กรุณาลองใหม่' };
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: `เธฃเธฐเธเธเธ•เธญเธเธเธฅเธฑเธเธเธดเธ”เธเธฅเธฒเธ” (${response.status})`
+      };
+    }
+
+    return await response.json();
+  } catch (error) {
+    return {
+      success: false,
+      message: error.name === 'AbortError'
+        ? 'เธฃเธฐเธเธเนเธเนเน€เธงเธฅเธฒเธ•เธญเธเธเธฅเธฑเธเธเธฒเธเน€เธเธดเธเนเธ เธเธฃเธธเธ“เธฒเธฅเธญเธเนเธซเธกเน'
+        : 'เน€เธเธทเนเธญเธกเธ•เนเธญเธฃเธฐเธเธเนเธกเนเนเธ”เน เธเธฃเธธเธ“เธฒเธฅเธญเธเนเธซเธกเน'
+    };
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
@@ -68,8 +105,12 @@ function showToast(message, type = 'info', duration = 3000) {
   const toast = document.createElement('div');
   toast.className = `toast toast--${type}`;
   toast.textContent = message;
+  toast.setAttribute('role', 'status');
+  toast.setAttribute('aria-live', 'polite');
   document.body.appendChild(toast);
+
   requestAnimationFrame(() => toast.classList.add('toast--show'));
+
   setTimeout(() => {
     toast.classList.remove('toast--show');
     setTimeout(() => toast.remove(), 300);
