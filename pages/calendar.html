@@ -227,15 +227,28 @@
   const button = document.createElement('button');
   button.type = 'button';
   button.className = `test-btn${type === 'post' ? ' test-btn--post' : ''}`;
-  button.setAttribute('aria-label', `${label} ${course.CourseName || ''}`);
+  button.setAttribute(
+    'aria-label',
+    `${label} ${course.CourseName || ''}`
+  );
 
   button.append(
-    icon('<path d="M8 3h8l4 4v14H4V3h4zM14 3v5h5M8 13h8M8 17h5" stroke-linecap="round" stroke-linejoin="round"/>'),
+    icon(
+      '<path d="M8 3h8l4 4v14H4V3h4zM14 3v5h5M8 13h8M8 17h5" stroke-linecap="round" stroke-linejoin="round"/>'
+    ),
     document.createTextNode(label)
   );
 
   button.addEventListener('click', () => {
-    showToast('ระบบแบบทดสอบจะเปิดใช้งานใน Step ถัดไป', 'info');
+    const courseId = course.CourseID;
+
+    if (!courseId) {
+      showToast('ไม่พบรหัสหลักสูตร', 'error');
+      return;
+    }
+
+    window.location.href =
+      `test.html?courseId=${encodeURIComponent(courseId)}&testType=${encodeURIComponent(type)}`;
   });
 
   return button;
