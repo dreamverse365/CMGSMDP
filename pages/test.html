@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>CMG SMDP — Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/app.css">
+  <style>
+    body { padding-bottom: env(safe-area-inset-bottom, 0px); }
+    .test-shell { max-width: 580px; margin: 0 auto; padding: 20px 20px 32px; }
+    .test-header-meta { margin: 4px 0 20px; }
+    .test-type {
+      display: inline-flex; align-items: center; min-height: 25px; padding: 4px 10px;
+      border-radius: 99px; background: var(--gold-dim); color: var(--gold-light);
+      font: 700 9px/1 'Manrope', sans-serif; letter-spacing: .1em; margin-bottom: 10px;
+    }
+    .test-course { color: var(--text); font: 800 20px/1.35 'Manrope', sans-serif; }
+    .test-instruction { color: var(--text-2); font-size: 12px; line-height: 1.6; margin-top: 6px; }
+
+    .progress-panel {
+      padding: 16px; margin-bottom: 16px; border-radius: var(--radius-lg);
+      background: var(--surface); border: 1px solid var(--border);
+    }
+    .progress-copy { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 10px; }
+    .progress-copy span { color: var(--text-2); font-size: 11px; }
+    .progress-copy strong { color: var(--gold-light); font: 700 11px/1 'Manrope', sans-serif; }
+    .test-progress { height: 4px; background: var(--surface-3); border-radius: 99px; overflow: hidden; }
+    .test-progress__fill {
+      height: 100%; width: 0; border-radius: inherit;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      transition: width .25s ease-out;
+    }
+    .question-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 13px; }
+    .question-dot {
+      width: 29px; height: 29px; display: grid; place-items: center;
+      border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2);
+      color: var(--text-3); cursor: pointer; font: 600 10px/1 'Inter', sans-serif;
+      transition: color .2s, border-color .2s, background .2s;
+    }
+    .question-dot:hover { color: var(--text); border-color: var(--border-hover); }
+    .question-dot.answered { color: #79d7aa; border-color: rgba(76,175,130,.35); }
+    .question-dot.current { color: #0a0a0f; border-color: var(--gold-light); background: var(--gold-light); }
+
+    .question-card {
+      padding: 22px 20px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-xl); min-height: 330px;
+    }
+    .question-number { color: var(--gold); font: 700 10px/1 'Manrope', sans-serif; letter-spacing: .13em; }
+    .question-text { color: var(--text); font-size: 17px; line-height: 1.65; font-weight: 600; margin: 13px 0 20px; }
+    .choice-list { display: grid; gap: 10px; }
+    .choice {
+      position: relative; display: grid; grid-template-columns: 34px minmax(0,1fr);
+      align-items: center; gap: 12px; min-height: 58px; padding: 10px 14px;
+      border: 1px solid var(--border); border-radius: 14px; background: var(--surface-2);
+      color: var(--text-2); cursor: pointer; transition: color .2s, border-color .2s, background .2s;
+    }
+    .choice:hover { color: var(--text); border-color: var(--border-hover); }
+    .choice.selected { color: var(--text); border-color: rgba(201,168,76,.52); background: var(--gold-dim2); }
+    .choice input { position: absolute; opacity: 0; pointer-events: none; }
+    .choice-key {
+      width: 32px; height: 32px; display: grid; place-items: center;
+      border-radius: 9px; background: var(--surface-3); color: var(--text-2);
+      font: 700 11px/1 'Manrope', sans-serif;
+    }
+    .choice.selected .choice-key { color: #0a0a0f; background: var(--gold-light); }
+    .choice-text { font-size: 14px; line-height: 1.5; }
+
+    .test-actions { display: grid; grid-template-columns: 1fr 1.35fr; gap: 10px; margin-top: 16px; }
+    .test-actions .btn { min-height: 48px; }
+    .btn svg { width: 17px; height: 17px; }
+    .btn[hidden] { display: none; }
+
+    .test-state {
+      padding: 54px 24px; text-align: center; background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius-xl);
+    }
+    .test-state svg { width: 44px; height: 44px; color: var(--gold); margin-bottom: 14px; }
+    .test-state h2 { font: 800 18px/1.4 'Manrope', sans-serif; }
+    .test-state p { color: var(--text-2); font-size: 13px; line-height: 1.65; margin-top: 7px; }
+    .test-state .btn { min-height: 44px; margin-top: 18px; }
+
+    .result-overlay {
+      display: none; position: fixed; inset: 0; z-index: 300; align-items: center;
+      justify-content: center; padding: 24px; background: rgba(0,0,0,.78);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .result-overlay.visible { display: flex; }
+    .result-card {
+      width: 100%; max-width: 380px; padding: 30px 24px; text-align: center;
+      border-radius: var(--radius-xl); background: var(--surface);
+      border: 1px solid rgba(201,168,76,.25); box-shadow: 0 24px 70px rgba(0,0,0,.5);
+    }
+    .result-icon {
+      width: 58px; height: 58px; display: grid; place-items: center; margin: 0 auto 18px;
+      border-radius: 50%; background: var(--gold-dim); color: var(--gold-light);
+    }
+    .result-icon svg { width: 28px; height: 28px; }
+    .result-title { font: 800 20px/1.3 'Manrope', sans-serif; }
+    .result-score { color: var(--gold-light); font: 800 54px/1 'Manrope', sans-serif; margin: 18px 0 5px; }
+    .result-score small { color: var(--text-3); font-size: 18px; }
+    .result-label { color: var(--text-2); font-size: 11px; letter-spacing: .12em; }
+    .result-point {
+      display: none; margin: 18px 0 0; padding: 11px; border-radius: 12px;
+      background: rgba(76,175,130,.1); color: #79d7aa; font-size: 13px; font-weight: 700;
+    }
+    .result-card .btn { min-height: 48px; margin-top: 22px; }
+
+    .page-header__back { min-width: 44px; min-height: 44px; }
+    button:focus-visible, label:has(input:focus-visible), a:focus-visible {
+      outline: 2px solid var(--gold-light); outline-offset: 3px;
+    }
+    @media (max-width: 360px) {
+      .test-shell { padding-inline: 16px; }
+      .question-card { padding-inline: 16px; }
+      .choice { padding-inline: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <button class="page-header__back" type="button" id="backButton" aria-label="กลับหน้าตารางหลักสูตร">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M13 4l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      กลับ
+    </button>
+    <div class="page-header__title" id="headerTitle">TEST</div>
+    <div style="width:44px" aria-hidden="true"></div>
+  </header>
+
+  <main class="test-shell">
+    <section class="test-header-meta" id="testMeta" hidden>
+      <div class="test-type" id="testType">PRE-TEST</div>
+      <h1 class="test-course" id="courseName">Loading...</h1>
+      <p class="test-instruction">เลือกคำตอบที่ถูกต้องที่สุดให้ครบทุกข้อก่อนส่งคำตอบ</p>
+    </section>
+
+    <div id="testContent" aria-live="polite" aria-busy="true">
+      <div class="loading-list" aria-label="กำลังโหลดแบบทดสอบ">
+        <div class="skeleton" style="height:88px;border-radius:18px;margin-bottom:16px"></div>
+        <div class="skeleton" style="height:360px;border-radius:24px"></div>
+      </div>
+    </div>
+  </main>
+
+  <div class="result-overlay" id="resultOverlay" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+    <div class="result-card">
+      <div class="result-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12l4 4L19 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2 class="result-title" id="resultTitle">ส่งคำตอบสำเร็จ</h2>
+      <div class="result-score"><span id="scoreValue">0</span><small id="scoreTotal">/10</small></div>
+      <div class="result-label">SCORE</div>
+      <div class="result-point" id="resultPoint"></div>
+      <button class="btn btn--gold btn--full" type="button" onclick="location.href='calendar.html'">กลับสู่ตารางหลักสูตร</button>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script>
+    const session = Session.require();
+    const params = new URLSearchParams(window.location.search);
+    const courseId = params.get('course') || '';
+    const testType = (params.get('type') || '').toLowerCase();
+    const answers = {};
+    let questions = [];
+    let currentIndex = 0;
+    let submitting = false;
+
+    function validRequest() {
+      return courseId && ['pre', 'post'].includes(testType);
+    }
+
+    function textElement(tag, className, text) {
+      const element = document.createElement(tag);
+      element.className = className;
+      element.textContent = text ?? '';
+      return element;
+    }
+
+    function renderState(title, message, retry = false) {
+      const content = document.getElementById('testContent');
+      content.setAttribute('aria-busy', 'false');
+      content.innerHTML = '<div class="test-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01" stroke-linecap="round"/></svg><h2 id="stateTitle"></h2><p id="stateMessage"></p><button class="btn btn--ghost" id="stateButton" type="button"></button></div>';
+      document.getElementById('stateTitle').textContent = title;
+      document.getElementById('stateMessage').textContent = message;
+      const button = document.getElementById('stateButton');
+      button.textContent = retry ? 'ลองใหม่' : 'กลับสู่ Calendar';
+      button.addEventListener('click', retry ? loadTest : () => { location.href = 'calendar.html'; });
+    }
+
+    function updateProgress() {
+      const answered = Object.keys(answers).length;
+      document.getElementById('progressText').textContent = `ตอบแล้ว ${answered} จาก ${questions.length} ข้อ`;
+      document.getElementById('progressPercent').textContent = `${Math.round((answered / questions.length) * 100)}%`;
+      document.getElementById('progressFill').style.width = `${(answered / questions.length) * 100}%`;
+      document.querySelectorAll('.question-dot').forEach((dot, index) => {
+        dot.classList.toggle('answered', answers[questions[index].questionNo] !== undefined);
+        dot.classList.toggle('current', index === currentIndex);
+      });
+    }
+
+    function renderQuestion() {
+      const question = questions[currentIndex];
+      const questionArea = document.getElementById('questionArea');
+      questionArea.replaceChildren();
+
+      const card = document.createElement('section');
+      card.className = 'question-card';
+      card.append(
+        textElement('div', 'question-number', `QUESTION ${currentIndex + 1} OF ${questions.length}`),
+        textElement('h2', 'question-text', question.question)
+      );
+
+      const list = document.createElement('div');
+      list.className = 'choice-list';
+      Object.entries(question.choices).forEach(([key, value]) => {
+        const label = document.createElement('label');
+        label.className = `choice${answers[question.questionNo] === key ? ' selected' : ''}`;
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = `question-${question.questionNo}`;
+        input.value = key;
+        input.checked = answers[question.questionNo] === key;
+        input.addEventListener('change', () => {
+          answers[question.questionNo] = key;
+          renderQuestion();
+          updateProgress();
+        });
+        label.append(input, textElement('span', 'choice-key', key), textElement('span', 'choice-text', value));
+        list.appendChild(label);
+      });
+      card.appendChild(list);
+      questionArea.appendChild(card);
+
+      const previous = document.getElementById('previousButton');
+      const next = document.getElementById('nextButton');
+      const submit = document.getElementById('submitButton');
+      previous.disabled = currentIndex === 0;
+      next.hidden = currentIndex === questions.length - 1;
+      submit.hidden = currentIndex !== questions.length - 1;
+      submit.disabled = Object.keys(answers).length !== questions.length || submitting;
+      updateProgress();
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      card.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    }
+
+    function buildTest() {
+      const content = document.getElementById('testContent');
+      content.innerHTML = '<section class="progress-panel"><div class="progress-copy"><span id="progressText"></span><strong id="progressPercent"></strong></div><div class="test-progress"><div class="test-progress__fill" id="progressFill"></div></div><div class="question-nav" id="questionNav" aria-label="เลือกข้อคำถาม"></div></section><div id="questionArea"></div><div class="test-actions"><button class="btn btn--ghost" id="previousButton" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>ย้อนกลับ</button><button class="btn btn--gold" id="nextButton" type="button">ข้อต่อไป<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="btn btn--gold" id="submitButton" type="button" hidden>ส่งคำตอบ</button></div>';
+      content.setAttribute('aria-busy', 'false');
+
+      questions.forEach((question, index) => {
+        const dot = textElement('button', 'question-dot', index + 1);
+        dot.type = 'button';
+        dot.setAttribute('aria-label', `ไปข้อ ${index + 1}`);
+        dot.addEventListener('click', () => { currentIndex = index; renderQuestion(); });
+        document.getElementById('questionNav').appendChild(dot);
+      });
+
+      document.getElementById('previousButton').addEventListener('click', () => {
+        if (currentIndex > 0) { currentIndex -= 1; renderQuestion(); }
+      });
+      document.getElementById('nextButton').addEventListener('click', () => {
+        if (currentIndex < questions.length - 1) { currentIndex += 1; renderQuestion(); }
+      });
+      document.getElementById('submitButton').addEventListener('click', submitAnswers);
+      renderQuestion();
+    }
+
+    async function loadTest() {
+      if (!validRequest()) {
+        renderState('ลิงก์แบบทดสอบไม่ถูกต้อง', 'กรุณาเข้าสู่แบบทดสอบผ่านหน้า Calendar');
+        return;
+      }
+
+      document.getElementById('testType').textContent = testType === 'pre' ? 'PRE-TEST' : 'POST-TEST';
+      document.getElementById('headerTitle').textContent = testType === 'pre' ? 'PRE-TEST' : 'POST-TEST';
+
+      const [testResult, courseResult] = await Promise.all([
+        api('getTest', { empId: session.empId, courseId, testType }),
+        api('getCourses')
+      ]);
+
+      if (courseResult.success && Array.isArray(courseResult.courses)) {
+        const course = courseResult.courses.find(item => String(item.CourseID) === String(courseId));
+        document.getElementById('courseName').textContent = course?.CourseName || courseId;
+      } else {
+        document.getElementById('courseName').textContent = courseId;
+      }
+      document.getElementById('testMeta').hidden = false;
+
+      if (!testResult.success) {
+        const alreadyTaken = String(testResult.message || '').includes('ทำแบบทดสอบนี้ไปแล้ว');
+        renderState(alreadyTaken ? 'ทำแบบทดสอบแล้ว' : 'โหลดแบบทดสอบไม่สำเร็จ', testResult.message || 'กรุณาลองใหม่อีกครั้ง', !alreadyTaken);
+        return;
+      }
+
+      questions = Array.isArray(testResult.questions) ? testResult.questions : [];
+      if (!questions.length) {
+        renderState('ยังไม่มีคำถาม', 'ผู้ดูแลระบบยังไม่ได้เพิ่มคำถามสำหรับแบบทดสอบนี้');
+        return;
+      }
+      buildTest();
+    }
+
+    async function submitAnswers() {
+      if (submitting || Object.keys(answers).length !== questions.length) return;
+      if (!confirm('ยืนยันส่งคำตอบ? เมื่อส่งแล้วจะไม่สามารถทำแบบทดสอบนี้ซ้ำได้')) return;
+
+      submitting = true;
+      const button = document.getElementById('submitButton');
+      button.disabled = true;
+      button.textContent = 'กำลังส่ง...';
+
+      const result = await api('submitTest', {
+        empId: session.empId,
+        courseId,
+        testType,
+        answers
+      });
+
+      if (!result.success) {
+        submitting = false;
+        button.disabled = false;
+        button.textContent = 'ส่งคำตอบ';
+        showToast(result.message || 'ส่งคำตอบไม่สำเร็จ', 'error');
+        return;
+      }
+
+      document.getElementById('scoreValue').textContent = Number(result.score) || 0;
+      document.getElementById('scoreTotal').textContent = `/${Number(result.total) || questions.length}`;
+      const point = Number(result.pointEarned) || 0;
+      if (point > 0) {
+        const pointBox = document.getElementById('resultPoint');
+        pointBox.textContent = `ได้รับ +${point} Points`;
+        pointBox.style.display = 'block';
+      }
+      document.getElementById('resultOverlay').classList.add('visible');
+    }
+
+    document.getElementById('backButton').addEventListener('click', () => {
+      if (Object.keys(answers).length > 0 && !submitting) {
+        if (!confirm('ออกจากแบบทดสอบ? คำตอบที่เลือกไว้จะไม่ถูกบันทึก')) return;
+      }
+      location.href = 'calendar.html';
+    });
+
+    loadTest();
+  </script>
+</body>
+</html>
