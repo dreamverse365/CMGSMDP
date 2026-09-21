@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>CMG SMDP — Calendar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/app.css">
+  <style>
+    .calendar-intro { margin: 4px 0 22px; }
+    .calendar-eyebrow {
+      color: var(--gold); font: 700 10px/1 'Manrope', sans-serif;
+      letter-spacing: .18em; margin-bottom: 9px;
+    }
+    .calendar-title {
+      font: 800 clamp(25px, 7vw, 34px)/1.15 'Manrope', sans-serif;
+      letter-spacing: -.03em; margin-bottom: 9px;
+    }
+    .calendar-copy { color: var(--text-2); font-size: 13px; line-height: 1.65; }
+
+    .filter-tabs {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+      padding: 4px; margin-bottom: 20px; border-radius: 14px;
+      background: var(--surface); border: 1px solid var(--border);
+    }
+    .filter-tab {
+      min-height: 42px; padding: 8px; border: 0; border-radius: 10px;
+      background: transparent; color: var(--text-3); cursor: pointer;
+      font: 600 11px/1.2 'Inter', sans-serif; transition: color .2s, background .2s;
+    }
+    .filter-tab:hover { color: var(--text); }
+    .filter-tab.active { color: #0a0a0f; background: var(--gold-light); }
+
+    .course-list { display: grid; gap: 14px; }
+    .course-card {
+      position: relative; overflow: hidden; background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+      transition: border-color .2s, transform .2s;
+    }
+    .course-card:hover { border-color: var(--border-hover); }
+    .course-card.is-past { opacity: .72; }
+    .course-card__accent {
+      position: absolute; top: 0; bottom: 0; left: 0; width: 3px;
+      background: var(--gold);
+    }
+    .course-card.is-online .course-card__accent { background: var(--info); }
+    .course-card.is-past .course-card__accent { background: var(--text-3); }
+    .course-card__body { padding: 18px 18px 16px 20px; }
+    .course-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+    .course-date {
+      width: 54px; flex: 0 0 54px; padding: 9px 5px; text-align: center;
+      border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border);
+    }
+    .course-date__day { color: var(--gold-light); font: 800 22px/1 'Manrope', sans-serif; }
+    .course-date__month { color: var(--text-2); font-size: 10px; margin-top: 5px; letter-spacing: .05em; }
+    .course-info { min-width: 0; flex: 1; }
+    .course-labels { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .course-pill {
+      display: inline-flex; align-items: center; min-height: 22px; padding: 3px 8px;
+      border-radius: 99px; font-size: 9px; font-weight: 700; letter-spacing: .06em;
+    }
+    .course-pill--journey { color: var(--gold-light); background: var(--gold-dim); }
+    .course-pill--classroom { color: #70d5a6; background: rgba(76,175,130,.11); }
+    .course-pill--online { color: #8ab4f8; background: rgba(91,156,246,.12); }
+    .course-pill--past { color: var(--text-2); background: var(--surface-2); }
+    .course-name { color: var(--text); font: 700 15px/1.45 'Manrope', sans-serif; }
+    .course-meta { display: grid; gap: 8px; margin-top: 15px; }
+    .course-meta__item { display: flex; align-items: flex-start; gap: 9px; color: var(--text-2); font-size: 12px; line-height: 1.45; }
+    .course-meta__item svg { width: 15px; height: 15px; flex: 0 0 15px; color: var(--text-3); margin-top: 1px; }
+    .course-actions {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 9px;
+      padding: 13px 18px 15px 20px; border-top: 1px solid var(--border);
+      background: rgba(255,255,255,.01);
+    }
+    .test-btn {
+      min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      padding: 10px; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--surface-2); color: var(--text-2); cursor: pointer;
+      font: 600 11px/1 'Inter', sans-serif; transition: color .2s, border-color .2s, background .2s;
+    }
+    .test-btn:hover { color: var(--text); border-color: var(--border-hover); }
+    .test-btn svg { width: 15px; height: 15px; }
+    .test-btn--post { color: var(--gold-light); border-color: rgba(201,168,76,.2); background: var(--gold-dim2); }
+    .test-btn[disabled] { opacity: .48; cursor: not-allowed; }
+
+    .status-line {
+      display: flex; justify-content: space-between; align-items: center;
+      margin: 0 2px 12px; color: var(--text-3); font-size: 11px;
+    }
+    .status-count { color: var(--text-2); font-weight: 600; }
+    .loading-list { display: grid; gap: 14px; }
+    .loading-card { height: 205px; border-radius: var(--radius-lg); }
+    .state-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+    .state-card .btn { min-height: 44px; margin-top: 16px; }
+
+    .page-header__back { min-width: 44px; min-height: 44px; }
+    .nav-item { min-height: 48px; }
+    button:focus-visible, a:focus-visible {
+      outline: 2px solid var(--gold-light); outline-offset: 3px;
+    }
+    @media (max-width: 360px) {
+      .page-body { padding-inline: 16px; }
+      .course-card__body { padding-inline: 16px; }
+      .course-actions { padding-inline: 16px; }
+      .filter-tab { font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <button class="page-header__back" type="button" onclick="location.href='home.html'" aria-label="กลับหน้าหลัก">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="M13 4l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      กลับ
+    </button>
+    <div class="page-header__title">CALENDAR</div>
+    <div style="width:44px" aria-hidden="true"></div>
+  </header>
+
+  <main class="page-body">
+    <section class="calendar-intro" aria-labelledby="calendarTitle">
+      <div class="calendar-eyebrow">LEARNING JOURNEY</div>
+      <h1 class="calendar-title" id="calendarTitle">Course Calendar</h1>
+      <p class="calendar-copy">ตารางหลักสูตรและกิจกรรมตลอดโครงการ พร้อมช่องทางเข้าสู่แบบทดสอบ</p>
+    </section>
+
+    <div class="filter-tabs" role="tablist" aria-label="กรองหลักสูตร">
+      <button class="filter-tab active" type="button" role="tab" aria-selected="true" data-filter="all">ทั้งหมด</button>
+      <button class="filter-tab" type="button" role="tab" aria-selected="false" data-filter="upcoming">กำลังจะมาถึง</button>
+      <button class="filter-tab" type="button" role="tab" aria-selected="false" data-filter="past">ผ่านมาแล้ว</button>
+    </div>
+
+    <div class="status-line" id="statusLine" hidden>
+      <span id="filterLabel">หลักสูตรทั้งหมด</span>
+      <span class="status-count" id="courseCount">0 รายการ</span>
+    </div>
+
+    <div id="courseContent" aria-live="polite" aria-busy="true">
+      <div class="loading-list" aria-label="กำลังโหลดหลักสูตร">
+        <div class="skeleton loading-card"></div>
+        <div class="skeleton loading-card"></div>
+        <div class="skeleton loading-card"></div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav" aria-label="เมนูหลัก">
+    <a class="nav-item" href="home.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 12L12 3l9 9M9 21V12h6v9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="nav-item__label">หน้าหลัก</span>
+    </a>
+    <a class="nav-item active" href="calendar.html" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      <span class="nav-item__label">ตาราง</span>
+    </a>
+    <a class="nav-item" href="ranking.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M18 20V10M12 20V4M6 20v-6" stroke-linecap="round"/></svg>
+      <span class="nav-item__label">Ranking</span>
+    </a>
+    <a class="nav-item" href="redeem.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7M22 7H2v5h20V7zM12 22V7"/></svg>
+      <span class="nav-item__label">Redeem</span>
+    </a>
+  </nav>
+
+  <script src="../js/config.js"></script>
+  <script>
+    const session = Session.require();
+    const MONTH_TH = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    let courses = [];
+    let activeFilter = 'all';
+
+    function parseCourseDate(value) {
+      if (!value) return null;
+      const direct = new Date(value);
+      if (!Number.isNaN(direct.getTime())) return direct;
+
+      const match = String(value).trim().match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+      if (!match) return null;
+      let year = Number(match[3]);
+      if (year > 2400) year -= 543;
+      const parsed = new Date(year, Number(match[2]) - 1, Number(match[1]));
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    }
+
+    function isPastCourse(course) {
+      const date = parseCourseDate(course.Date);
+      if (!date) return false;
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+      return endOfDay < new Date();
+    }
+
+    function textElement(tag, className, text) {
+      const element = document.createElement(tag);
+      element.className = className;
+      element.textContent = text ?? '';
+      return element;
+    }
+
+    function icon(path) {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('fill', 'none');
+      svg.setAttribute('stroke', 'currentColor');
+      svg.setAttribute('stroke-width', '1.5');
+      svg.setAttribute('aria-hidden', 'true');
+      svg.innerHTML = path;
+      return svg;
+    }
+
+    function metaItem(type, text) {
+      const item = document.createElement('div');
+      item.className = 'course-meta__item';
+      const paths = {
+        time: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round"/>',
+        location: '<path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="2.5"/>',
+        format: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 21h8M12 19v2"/>'
+      };
+      item.append(icon(paths[type]), textElement('span', '', text));
+      return item;
+    }
+
+    function createTestButton(label, type, course) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `test-btn${type === 'post' ? ' test-btn--post' : ''}`;
+      button.setAttribute('aria-label', `${label} ${course.CourseName || ''}`);
+      button.append(
+        icon('<path d="M8 3h8l4 4v14H4V3h4zM14 3v5h5M8 13h8M8 17h5" stroke-linecap="round" stroke-linejoin="round"/>'),
+        document.createTextNode(label)
+      );
+      button.addEventListener('click', () => {
+        showToast('ระบบแบบทดสอบจะเปิดใช้งานใน Step ถัดไป', 'info');
+      });
+      return button;
+    }
+
+    function createCourseCard(course) {
+      const date = parseCourseDate(course.Date);
+      const past = isPastCourse(course);
+      const online = String(course.Format || '').toLowerCase() === 'online';
+      const card = document.createElement('article');
+      card.className = `course-card${past ? ' is-past' : ''}${online ? ' is-online' : ''}`;
+
+      const accent = document.createElement('div');
+      accent.className = 'course-card__accent';
+      accent.setAttribute('aria-hidden', 'true');
+
+      const body = document.createElement('div');
+      body.className = 'course-card__body';
+      const top = document.createElement('div');
+      top.className = 'course-top';
+
+      const dateBlock = document.createElement('div');
+      dateBlock.className = 'course-date';
+      dateBlock.append(
+        textElement('div', 'course-date__day', date ? date.getDate() : '—'),
+        textElement('div', 'course-date__month', date ? `${MONTH_TH[date.getMonth()]} ${date.getFullYear() + 543}` : 'ไม่ระบุ')
+      );
+
+      const info = document.createElement('div');
+      info.className = 'course-info';
+      const labels = document.createElement('div');
+      labels.className = 'course-labels';
+      if (course.JourneyNo) labels.appendChild(textElement('span', 'course-pill course-pill--journey', `JOURNEY ${course.JourneyNo}`));
+      labels.appendChild(textElement('span', `course-pill course-pill--${online ? 'online' : 'classroom'}`, online ? 'ONLINE' : 'CLASSROOM'));
+      if (past) labels.appendChild(textElement('span', 'course-pill course-pill--past', 'COMPLETED'));
+      info.append(labels, textElement('h2', 'course-name', course.CourseName || 'ไม่ระบุชื่อหลักสูตร'));
+      top.append(dateBlock, info);
+
+      const meta = document.createElement('div');
+      meta.className = 'course-meta';
+      meta.append(
+        metaItem('time', course.Time || 'ยังไม่ระบุเวลา'),
+        metaItem('location', course.Location || (online ? 'Online' : 'ยังไม่ระบุสถานที่')),
+        metaItem('format', online ? 'เรียนผ่านระบบ Online' : 'เข้าอบรมแบบ Classroom')
+      );
+      body.append(top, meta);
+
+      const actions = document.createElement('div');
+      actions.className = 'course-actions';
+      actions.append(createTestButton('Pre-test', 'pre', course), createTestButton('Post-test', 'post', course));
+      card.append(accent, body, actions);
+      return card;
+    }
+
+    function filteredCourses() {
+      if (activeFilter === 'upcoming') return courses.filter(course => !isPastCourse(course));
+      if (activeFilter === 'past') return courses.filter(isPastCourse);
+      return courses;
+    }
+
+    function renderCourses() {
+      const content = document.getElementById('courseContent');
+      const list = filteredCourses();
+      const labels = { all: 'หลักสูตรทั้งหมด', upcoming: 'กำลังจะมาถึง', past: 'ผ่านมาแล้ว' };
+      document.getElementById('filterLabel').textContent = labels[activeFilter];
+      document.getElementById('courseCount').textContent = `${list.length} รายการ`;
+      document.getElementById('statusLine').hidden = false;
+      content.setAttribute('aria-busy', 'false');
+
+      if (!list.length) {
+        content.innerHTML = '<div class="state-card empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><p>ไม่พบหลักสูตรในหมวดนี้</p></div>';
+        return;
+      }
+
+      const courseList = document.createElement('div');
+      courseList.className = 'course-list';
+      list.forEach(course => courseList.appendChild(createCourseCard(course)));
+      content.replaceChildren(courseList);
+    }
+
+    function renderError(message) {
+      const content = document.getElementById('courseContent');
+      content.setAttribute('aria-busy', 'false');
+      content.innerHTML = '<div class="state-card empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01" stroke-linecap="round"/></svg><p>โหลดตารางหลักสูตรไม่สำเร็จ</p><small id="courseError" style="display:block;margin-top:6px"></small><button class="btn btn--ghost" type="button" onclick="loadCourses()">ลองใหม่</button></div>';
+      document.getElementById('courseError').textContent = message || 'กรุณาลองใหม่อีกครั้ง';
+    }
+
+    async function loadCourses() {
+      const content = document.getElementById('courseContent');
+      content.setAttribute('aria-busy', 'true');
+      const result = await api('getCourses');
+      if (!result.success) {
+        renderError(result.message);
+        return;
+      }
+
+      courses = Array.isArray(result.courses) ? result.courses : [];
+      courses.sort((a, b) => {
+        const dateA = parseCourseDate(a.Date)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+        const dateB = parseCourseDate(b.Date)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+        return dateA - dateB;
+      });
+      renderCourses();
+    }
+
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        activeFilter = tab.dataset.filter;
+        document.querySelectorAll('.filter-tab').forEach(item => {
+          const active = item === tab;
+          item.classList.toggle('active', active);
+          item.setAttribute('aria-selected', String(active));
+        });
+        renderCourses();
+      });
+    });
+
+    loadCourses();
+  </script>
+</body>
+</html>
