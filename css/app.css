@@ -4,27 +4,46 @@
 
 /* ── TOKENS ──────────────────────────────────────────────── */
 :root {
-  --bg:            #0a0a0f;
-  --surface:       #13131a;
-  --surface-2:     #1c1c28;
-  --surface-3:     #242435;
-  --border:        rgba(255,255,255,0.07);
-  --border-hover:  rgba(255,255,255,0.14);
-  --gold:          #c9a84c;
-  --gold-light:    #e8c97a;
-  --gold-dim:      rgba(201,168,76,0.12);
-  --gold-dim2:     rgba(201,168,76,0.06);
-  --text:          #f0f0f0;
-  --text-2:        #8a8a9a;
-  --text-3:        #50505f;
-  --error:         #e05c5c;
-  --success:       #4caf82;
-  --info:          #5b9cf6;
-  --radius-sm:     8px;
-  --radius:        12px;
-  --radius-lg:     18px;
-  --radius-xl:     24px;
-  --nav-h:         64px;
+  /* CMG Brand */
+  --brand:          #ba2b2b;
+  --brand-hover:    #a12424;
+  --brand-light:    #d34a4a;
+  --brand-dim:      rgba(186,43,43,0.12);
+  --brand-dim2:     rgba(186,43,43,0.06);
+
+  /* Background & Surface */
+  --bg:             #f5f5f5;
+  --surface:        #ffffff;
+  --surface-2:      #f1f1f1;
+  --surface-3:      #e5e5e5;
+
+  /* Border */
+  --border:         rgba(25,25,25,0.09);
+  --border-hover:   rgba(186,43,43,0.30);
+
+  /* Gold Accent เดิม */
+  --gold:           #c9a84c;
+  --gold-light:     #e8c97a;
+  --gold-dim:       rgba(201,168,76,0.14);
+  --gold-dim2:      rgba(201,168,76,0.07);
+
+  /* Typography */
+  --text:           #222222;
+  --text-2:         #666666;
+  --text-3:         #999999;
+
+  /* Status */
+  --error:          #ba2b2b;
+  --success:        #31865f;
+  --info:           #547ba5;
+
+  /* Layout */
+  --radius-sm:      8px;
+  --radius:         12px;
+  --radius-lg:      18px;
+  --radius-xl:      24px;
+  --nav-h:          64px;
+
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -50,7 +69,7 @@ body {
 /* ── PAGE HEADER ──────────────────────────────────────────── */
 .page-header {
   position: sticky; top: env(safe-area-inset-top, 0px);
-  background: rgba(10,10,15,0.85);
+  background: rgba(255,255,255,0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
@@ -60,6 +79,7 @@ body {
   align-items: center;
   justify-content: space-between;
   min-height: 56px;
+   box-shadow: 0 4px 20px rgba(0,0,0,0.04);
 }
 
 .page-header__title {
@@ -85,10 +105,11 @@ body {
   bottom: 0; left: 0; right: 0;
   height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
   padding-bottom: env(safe-area-inset-bottom, 0px);
-  background: rgba(13,13,20,0.92);
+  background: rgba(255,255,255,0.94);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid var(--border);
+   box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
   display: flex;
   align-items: flex-start;
   justify-content: space-around;
@@ -116,7 +137,9 @@ body {
   line-height: 1;
 }
 
-.nav-item.active { color: var(--gold); }
+.nav-item.active {
+  color: var(--brand);
+}
 
 .nav-item.active::before {
   content: '';
@@ -124,7 +147,7 @@ body {
   top: -8px; left: 50%;
   transform: translateX(-50%);
   width: 20px; height: 2px;
-  background: var(--gold);
+  background: var(--brand);
   border-radius: 0 0 2px 2px;
 }
 
