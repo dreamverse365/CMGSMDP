@@ -160,8 +160,16 @@
   <script>
     const session = Session.require();
     const params = new URLSearchParams(window.location.search);
-    const courseId = params.get('course') || '';
-    const testType = (params.get('type') || '').toLowerCase();
+    const courseId =
+  params.get('course') ||
+  params.get('courseId') ||
+  '';
+
+const testType = (
+  params.get('type') ||
+  params.get('testType') ||
+  ''
+).toLowerCase();
     const answers = {};
     let questions = [];
     let currentIndex = 0;
