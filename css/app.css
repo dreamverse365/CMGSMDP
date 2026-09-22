@@ -86,7 +86,7 @@ body {
   min-height: 100%;
   background: var(--bg);
   color: var(--text);
-  font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+  font-family: 'Inter', 'Prompt', sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   padding-bottom:
@@ -156,7 +156,7 @@ textarea:focus-visible {
 
 .page-header__title {
   color: var(--text);
-  font-family: 'Manrope', 'Noto Sans Thai', sans-serif;
+  font-family: 'Manrope', 'Prompt', sans-serif;
   font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.06em;
