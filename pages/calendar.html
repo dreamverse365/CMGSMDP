@@ -8,9 +8,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/app.css">
   <style>
+    body::before {
+      content: '';
+      position: fixed;
+      top: -20%;
+      left: -10%;
+      width: 60vw;
+      height: 60vw;
+      background: radial-gradient(circle, rgba(186,43,43,.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .page-body { position: relative; z-index: 1; }
+
     .calendar-intro { margin: 4px 0 22px; }
     .calendar-eyebrow {
-      color: var(--gold); font: 700 10px/1 'Manrope', sans-serif;
+      color: var(--brand); font: 700 10px/1 'Manrope', sans-serif;
       letter-spacing: .18em; margin-bottom: 9px;
     }
     .calendar-title {
@@ -23,6 +36,7 @@
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
       padding: 4px; margin-bottom: 20px; border-radius: 14px;
       background: var(--surface); border: 1px solid var(--border);
+      box-shadow: 0 8px 24px rgba(25,25,25,.05);
     }
     .filter-tab {
       min-height: 42px; padding: 8px; border: 0; border-radius: 10px;
@@ -30,19 +44,28 @@
       font: 600 11px/1.2 'Inter', sans-serif; transition: color .2s, background .2s;
     }
     .filter-tab:hover { color: var(--text); }
-    .filter-tab.active { color: #0a0a0f; background: var(--gold-light); }
+    .filter-tab.active {
+      color: #fff;
+      background: linear-gradient(135deg, var(--brand), var(--brand-light));
+      box-shadow: 0 5px 14px rgba(186,43,43,.20);
+    }
 
     .course-list { display: grid; gap: 14px; }
     .course-card {
       position: relative; overflow: hidden; background: var(--surface);
       border: 1px solid var(--border); border-radius: var(--radius-lg);
-      transition: border-color .2s, transform .2s;
+      box-shadow: 0 8px 26px rgba(25,25,25,.055);
+      transition: border-color .2s, box-shadow .2s, transform .2s;
     }
-    .course-card:hover { border-color: var(--border-hover); }
+    .course-card:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 12px 34px rgba(25,25,25,.08);
+      transform: translateY(-1px);
+    }
     .course-card.is-past { opacity: .72; }
     .course-card__accent {
       position: absolute; top: 0; bottom: 0; left: 0; width: 3px;
-      background: var(--gold);
+      background: var(--brand);
     }
     .course-card.is-online .course-card__accent { background: var(--info); }
     .course-card.is-past .course-card__accent { background: var(--text-3); }
@@ -52,7 +75,7 @@
       width: 54px; flex: 0 0 54px; padding: 9px 5px; text-align: center;
       border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border);
     }
-    .course-date__day { color: var(--gold-light); font: 800 22px/1 'Manrope', sans-serif; }
+    .course-date__day { color: var(--brand); font: 800 22px/1 'Manrope', sans-serif; }
     .course-date__month { color: var(--text-2); font-size: 10px; margin-top: 5px; letter-spacing: .05em; }
     .course-info { min-width: 0; flex: 1; }
     .course-labels { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
@@ -60,9 +83,9 @@
       display: inline-flex; align-items: center; min-height: 22px; padding: 3px 8px;
       border-radius: 99px; font-size: 9px; font-weight: 700; letter-spacing: .06em;
     }
-    .course-pill--journey { color: var(--gold-light); background: var(--gold-dim); }
-    .course-pill--classroom { color: #70d5a6; background: rgba(76,175,130,.11); }
-    .course-pill--online { color: #8ab4f8; background: rgba(91,156,246,.12); }
+    .course-pill--journey { color: var(--brand); background: var(--brand-dim); }
+    .course-pill--classroom { color: var(--info); background: var(--info-soft, rgba(84,123,165,.10)); }
+    .course-pill--online { color: var(--success); background: var(--success-soft, rgba(49,134,95,.10)); }
     .course-pill--past { color: var(--text-2); background: var(--surface-2); }
     .course-name { color: var(--text); font: 700 15px/1.45 'Manrope', sans-serif; }
     .course-meta { display: grid; gap: 8px; margin-top: 15px; }
@@ -71,7 +94,7 @@
     .course-actions {
       display: grid; grid-template-columns: 1fr 1fr; gap: 9px;
       padding: 13px 18px 15px 20px; border-top: 1px solid var(--border);
-      background: rgba(255,255,255,.01);
+      background: var(--surface);
     }
     .test-btn {
       min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
@@ -81,7 +104,13 @@
     }
     .test-btn:hover { color: var(--text); border-color: var(--border-hover); }
     .test-btn svg { width: 15px; height: 15px; }
-    .test-btn--post { color: var(--gold-light); border-color: rgba(201,168,76,.2); background: var(--gold-dim2); }
+    .test-btn--post {
+      color: #fff;
+      border-color: var(--brand);
+      background: linear-gradient(135deg, var(--brand), var(--brand-light));
+      box-shadow: 0 5px 14px rgba(186,43,43,.16);
+    }
+    .test-btn--post:hover { color: #fff; border-color: var(--brand-hover); }
     .test-btn[disabled] { opacity: .48; cursor: not-allowed; }
 
     .status-line {
@@ -91,13 +120,16 @@
     .status-count { color: var(--text-2); font-weight: 600; }
     .loading-list { display: grid; gap: 14px; }
     .loading-card { height: 205px; border-radius: var(--radius-lg); }
-    .state-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+    .state-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); box-shadow: 0 8px 26px rgba(25,25,25,.055);
+    }
     .state-card .btn { min-height: 44px; margin-top: 16px; }
 
     .page-header__back { min-width: 44px; min-height: 44px; }
     .nav-item { min-height: 48px; }
     button:focus-visible, a:focus-visible {
-      outline: 2px solid var(--gold-light); outline-offset: 3px;
+      outline: 2px solid var(--brand); outline-offset: 3px;
     }
     @media (max-width: 360px) {
       .page-body { padding-inline: 16px; }
