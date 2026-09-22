@@ -6,28 +6,8 @@
   <title>CMG Store Manager Development Program</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
   <style>
-    /* ── TOKENS ─────────────────────────────── */
-    :root {
-      --bg:          #0a0a0f;
-      --surface:     #13131a;
-      --surface-2:   #1c1c28;
-      --border:      rgba(255,255,255,0.08);
-      --border-focus:rgba(255,255,255,0.35);
-      --gold:        #c9a84c;
-      --gold-light:  #e8c97a;
-      --gold-dim:    rgba(201,168,76,0.15);
-      --text:        #f0f0f0;
-      --text-2:      #8a8a9a;
-      --text-3:      #555568;
-      --error:       #e05c5c;
-      --success:     #4caf82;
-      --radius:      12px;
-      --radius-lg:   20px;
-      padding-top: env(safe-area-inset-top, 0px);
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-    }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
@@ -389,6 +369,15 @@
    CMG LOGIN — LIGHT THEME OVERRIDE
    วางไว้ท้าย <style> ก่อน </style>
    ============================================================ */
+  input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: 0 0 0 1000px #f5f5f5 inset;
+  box-shadow: 0 0 0 1000px #f5f5f5 inset;
+  caret-color: var(--text);
+  transition: background-color 9999s ease-in-out 0s;
+}
 
 html,
 body {
@@ -400,6 +389,7 @@ body {
 body {
   overflow-x: hidden;
   overflow-y: auto;
+  padding-bottom: 0;
 }
 
 /* ── BACKGROUND ─────────────────────────────────────────── */
