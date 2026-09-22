@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CMG SMDP — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/app.css">
+  <style>
+    :root { --admin-sidebar: 236px; }
+    * { box-sizing: border-box; }
+    body { padding: 0; font-family: 'Inter','Noto Sans Thai',sans-serif; background: #f5f5f5; }
+    button, input, select, textarea { font: inherit; }
+    .admin-shell { min-height: 100vh; }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; z-index: 100;
+      width: var(--admin-sidebar); padding: 22px 14px;
+      background: #fff; border-right: 1px solid var(--border);
+      overflow-y: auto;
+    }
+    .brand { padding: 0 10px 22px; border-bottom: 1px solid var(--border); }
+    .brand-kicker { color: var(--brand); font: 700 10px/1 'Manrope'; letter-spacing: .2em; }
+    .brand-title { margin-top: 5px; color: var(--text); font: 800 18px/1.2 'Manrope'; }
+    .brand-sub { margin-top: 4px; color: var(--text-3); font-size: 10px; }
+    .admin-nav { display: grid; gap: 4px; margin-top: 18px; }
+    .admin-nav button {
+      min-height: 44px; display: flex; align-items: center; gap: 11px;
+      width: 100%; padding: 10px 12px; border: 0; border-radius: 10px;
+      background: transparent; color: var(--text-2); cursor: pointer; text-align: left;
+      transition: background .2s, color .2s;
+    }
+    .admin-nav button:hover { background: var(--surface-2); color: var(--text); }
+    .admin-nav button.active { background: var(--brand-dim); color: var(--brand); font-weight: 700; }
+    .admin-nav svg { width: 18px; height: 18px; flex: 0 0 18px; }
+    .coming { margin-left: auto; color: var(--text-3); font-size: 8px; letter-spacing: .06em; }
+    .main { margin-left: var(--admin-sidebar); min-height: 100vh; }
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      min-height: 68px; padding: 12px 28px;
+      background: rgba(255,255,255,.94); border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+    }
+    .page-name { color: var(--text); font: 800 16px/1.2 'Manrope','Noto Sans Thai'; }
+    .operator { display: flex; align-items: center; gap: 9px; }
+    .operator label { color: var(--text-3); font-size: 10px; }
+    .operator input {
+      min-height: 40px; width: 180px; padding: 8px 11px;
+      border: 1px solid var(--border); border-radius: 9px; background: var(--surface-2); color: var(--text);
+    }
+    .content { max-width: 1240px; margin: 0 auto; padding: 28px; }
+    .view { display: none; }
+    .view.active { display: block; }
+    .intro { margin-bottom: 22px; }
+    .eyebrow { color: var(--brand); font: 700 10px/1 'Manrope'; letter-spacing: .18em; margin-bottom: 8px; }
+    h1 { color: var(--text); font: 800 28px/1.2 'Manrope','Noto Sans Thai'; }
+    .intro p { margin-top: 7px; color: var(--text-2); font-size: 13px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
+    .stat-card { padding: 18px; border: 1px solid var(--border); border-radius: 16px; background: #fff; box-shadow: 0 7px 24px rgba(25,25,25,.045); }
+    .stat-label { color: var(--text-3); font-size: 10px; font-weight: 700; letter-spacing: .08em; }
+    .stat-value { margin-top: 9px; color: var(--text); font: 800 28px/1 'Manrope'; }
+    .stat-card.is-alert .stat-value { color: var(--brand); }
+    .module-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; margin-top: 24px; }
+    .module-card { padding: 18px; border: 1px solid var(--border); border-radius: 16px; background: #fff; }
+    .module-card h2 { color: var(--text); font-size: 14px; }
+    .module-card p { margin-top: 6px; color: var(--text-3); font-size: 11px; line-height: 1.55; }
+    .module-status { display: inline-flex; margin-top: 14px; padding: 4px 9px; border-radius: 99px; color: var(--text-2); background: var(--surface-2); font-size: 9px; font-weight: 700; }
+    .module-status.ready { color: var(--success); background: var(--success-soft,rgba(49,134,95,.1)); }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 14px; margin-bottom: 14px; background: #fff; border: 1px solid var(--border); border-radius: 14px; }
+    .toolbar input, .toolbar select { min-height: 42px; padding: 8px 11px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface-2); color: var(--text); }
+    .toolbar input { flex: 1; min-width: 210px; }
+    .refresh-btn { min-height: 42px; padding: 8px 14px; border: 1px solid var(--border); border-radius: 9px; background: #fff; color: var(--text-2); cursor: pointer; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; background: #fff; }
+    table { width: 100%; border-collapse: collapse; min-width: 920px; }
+    th { padding: 12px 14px; background: var(--surface-2); color: var(--text-3); font-size: 9px; letter-spacing: .08em; text-align: left; }
+    td { padding: 13px 14px; border-top: 1px solid var(--border); color: var(--text-2); font-size: 11px; vertical-align: middle; }
+    .primary-cell { color: var(--text); font-weight: 700; }
+    .status { display: inline-flex; align-items: center; gap: 5px; padding: 5px 9px; border-radius: 99px; font-size: 9px; font-weight: 700; white-space: nowrap; }
+    .status::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
+    .pending { color: var(--gold-dark,#84651d); background: var(--gold-dim); }
+    .approved { color: var(--info); background: var(--info-soft,rgba(84,123,165,.1)); }
+    .delivered { color: var(--success); background: var(--success-soft,rgba(49,134,95,.1)); }
+    .rejected { color: var(--brand); background: var(--brand-dim); }
+    .action-group { display: flex; gap: 6px; }
+    .action-btn { min-height: 36px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border); background: #fff; color: var(--text-2); cursor: pointer; white-space: nowrap; }
+    .action-btn.primary { color: #fff; background: var(--brand); border-color: var(--brand); }
+    .action-btn.success { color: #fff; background: var(--success); border-color: var(--success); }
+    .empty { padding: 48px 20px; color: var(--text-3); text-align: center; }
+    .modal { display:none; position:fixed; inset:0; z-index:300; align-items:center; justify-content:center; padding:20px; background:rgba(0,0,0,.55); backdrop-filter:blur(5px); }
+    .modal.visible { display:flex; }
+    .modal-card { width:100%; max-width:460px; padding:24px; border-radius:18px; background:#fff; box-shadow:0 22px 70px rgba(0,0,0,.18); }
+    .modal-card h2 { color:var(--text); font:800 18px/1.3 'Manrope','Noto Sans Thai'; }
+    .modal-card p { margin-top:6px; color:var(--text-2); font-size:12px; line-height:1.55; }
+    .modal-summary { padding:12px; margin:16px 0; border-radius:10px; background:var(--surface-2); color:var(--text-2); font-size:11px; line-height:1.7; }
+    .field { margin-top:14px; }
+    .field label { display:block; margin-bottom:6px; color:var(--text-2); font-size:11px; font-weight:600; }
+    .field textarea { width:100%; min-height:82px; resize:vertical; padding:10px; border:1px solid var(--border); border-radius:9px; color:var(--text); }
+    .modal-actions { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:18px; }
+    .modal-actions button { min-height:44px; border-radius:9px; cursor:pointer; }
+    .cancel { border:1px solid var(--border); background:var(--surface-2); color:var(--text-2); }
+    .confirm { border:1px solid var(--brand); background:var(--brand); color:#fff; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline:2px solid var(--brand); outline-offset:2px; }
+    @media(max-width:900px) {
+      :root { --admin-sidebar: 0px; }
+      .sidebar { position:static; width:100%; padding:14px; border-right:0; border-bottom:1px solid var(--border); }
+      .brand { padding-bottom:12px; }
+      .admin-nav { display:flex; overflow-x:auto; margin-top:12px; padding-bottom:2px; }
+      .admin-nav button { width:auto; flex:0 0 auto; }
+      .coming { display:none; }
+      .main { margin-left:0; }
+      .topbar { padding:10px 16px; }
+      .content { padding:20px 16px; }
+      .stat-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .module-grid { grid-template-columns:1fr 1fr; }
+    }
+    @media(max-width:540px) {
+      .operator label { display:none; }
+      .operator input { width:140px; }
+      .stat-grid, .module-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-kicker">CMG SMDP</div><div class="brand-title">Admin Control</div><div class="brand-sub">Operations Dashboard</div></div>
+      <nav class="admin-nav" aria-label="เมนูผู้ดูแล">
+        <button class="active" data-view="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</button>
+        <button data-view="redeem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7M22 7H2v5h20V7zM12 22V7"/></svg>Redeem</button>
+        <button disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><path d="M14 14h3v3h3v3h-6z"/></svg>QR Point <span class="coming">NEXT</span></button>
+        <button disabled>Point Management <span class="coming">NEXT</span></button>
+        <button disabled>Ranking <span class="coming">NEXT</span></button>
+        <button disabled>Courses & Tests <span class="coming">NEXT</span></button>
+        <button disabled>Rewards & Stock <span class="coming">NEXT</span></button>
+        <button disabled>Users & Reports <span class="coming">NEXT</span></button>
+      </nav>
+    </aside>
+
+    <div class="main">
+      <header class="topbar"><div class="page-name" id="pageName">Dashboard</div><div class="operator"><label for="adminName">ผู้ดำเนินการ</label><input id="adminName" placeholder="ระบุชื่อ" autocomplete="name"></div></header>
+      <main class="content">
+        <section class="view active" id="dashboardView">
+          <div class="intro"><div class="eyebrow">CONTROL CENTER</div><h1>Dashboard</h1><p>ภาพรวมข้อมูลสำคัญของโครงการและรายการที่รอดำเนินการ</p></div>
+          <div class="stat-grid">
+            <div class="stat-card"><div class="stat-label">USERS</div><div class="stat-value" id="statUsers">—</div></div>
+            <div class="stat-card is-alert"><div class="stat-label">PENDING REDEEM</div><div class="stat-value" id="statPending">—</div></div>
+            <div class="stat-card"><div class="stat-label">DELIVERED</div><div class="stat-value" id="statDelivered">—</div></div>
+            <div class="stat-card"><div class="stat-label">REWARD STOCK</div><div class="stat-value" id="statStock">—</div></div>
+          </div>
+          <div class="module-grid">
+            <div class="module-card"><h2>Redeem Management</h2><p>อนุมัติ ส่งมอบ หรือยกเลิกพร้อมคืนคะแนนและ Stock</p><span class="module-status ready">พร้อมใช้งาน</span></div>
+            <div class="module-card"><h2>QR Point Generator</h2><p>สร้าง QR รับคะแนน กำหนดอายุและเหตุผลการให้คะแนน</p><span class="module-status">ขั้นตอนถัดไป</span></div>
+            <div class="module-card"><h2>Point Management</h2><p>ค้นหาพนักงาน เพิ่ม ลด และตรวจสอบประวัติคะแนน</p><span class="module-status">ขั้นตอนถัดไป</span></div>
+            <div class="module-card"><h2>Course & Test</h2><p>จัดการหลักสูตร แบบทดสอบ และตรวจสอบผลการทำข้อสอบ</p><span class="module-status">รอพัฒนา</span></div>
+            <div class="module-card"><h2>Rewards & Stock</h2><p>จัดการของรางวัล คะแนนที่ใช้ และจำนวนคงเหลือ</p><span class="module-status">รอพัฒนา</span></div>
+            <div class="module-card"><h2>Reports</h2><p>สรุปและดาวน์โหลดข้อมูลทั้งหมดเป็น Excel</p><span class="module-status">รอพัฒนา</span></div>
+          </div>
+        </section>
+
+        <section class="view" id="redeemView">
+          <div class="intro"><div class="eyebrow">REWARD OPERATIONS</div><h1>Redeem Management</h1><p>ตรวจสอบ อนุมัติ และบันทึกการส่งมอบรางวัล</p></div>
+          <div class="toolbar"><input id="searchInput" type="search" placeholder="ค้นหา Employee ID, ชื่อ หรือเลขอ้างอิง"><select id="statusFilter"><option value="ALL">ทุกสถานะ</option><option value="PENDING">รอตรวจสอบ</option><option value="APPROVED">อนุมัติแล้ว</option><option value="DELIVERED">ส่งมอบแล้ว</option><option value="REJECTED">ยกเลิก</option></select><button class="refresh-btn" id="refreshBtn">รีเฟรช</button></div>
+          <div class="table-wrap"><table><thead><tr><th>REFERENCE</th><th>EMPLOYEE</th><th>REWARD</th><th>POINT</th><th>DATE</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody id="redeemRows"><tr><td colspan="7" class="empty">กำลังโหลด...</td></tr></tbody></table></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal" id="actionModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card"><h2 id="modalTitle">ยืนยันรายการ</h2><p id="modalCopy"></p><div class="modal-summary" id="modalSummary"></div><div class="field"><label for="adminNote">หมายเหตุสำหรับ User</label><textarea id="adminNote" placeholder="เช่น กรุณาติดต่อ HR เพื่อรับรางวัล"></textarea></div><div class="modal-actions"><button class="cancel" id="cancelBtn">ยกเลิก</button><button class="confirm" id="confirmBtn">ยืนยัน</button></div></div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script>
+    const ADMIN_NAME_KEY = 'cmg_admin_operator';
+    let users = [], rewards = [], redeems = [], selected = null, selectedStatus = '', saving = false;
+    const statusMap = {
+      PENDING: { label:'รอตรวจสอบ', cls:'pending' }, APPROVED:{ label:'อนุมัติแล้ว', cls:'approved' },
+      DELIVERED:{ label:'ส่งมอบแล้ว', cls:'delivered' }, REJECTED:{ label:'ยกเลิก', cls:'rejected' }
+    };
+    const adminNameInput = document.getElementById('adminName');
+    adminNameInput.value = localStorage.getItem(ADMIN_NAME_KEY) || '';
+    adminNameInput.addEventListener('change', () => localStorage.setItem(ADMIN_NAME_KEY, adminNameInput.value.trim()));
+
+    function n(value){ const x=Number(value); return Number.isFinite(x)?x:0; }
+    function dateTime(value){ const d=new Date(value); return Number.isNaN(d.getTime())?String(value||'—'):new Intl.DateTimeFormat('th-TH',{dateStyle:'short',timeStyle:'short'}).format(d); }
+    function statusOf(value){ const key=String(value||'PENDING').toUpperCase(); return { key, ...(statusMap[key]||statusMap.PENDING) }; }
+
+    async function loadAll(){
+      const [userResult,rewardResult,redeemResult] = await Promise.all([api('adminGetAllUsers'),api('getRewards'),api('adminGetRedeemLog')]);
+      users = userResult.success && Array.isArray(userResult.users)?userResult.users:[];
+      rewards = rewardResult.success && Array.isArray(rewardResult.rewards)?rewardResult.rewards:[];
+      redeems = redeemResult.success && Array.isArray(redeemResult.log)?redeemResult.log:[];
+      renderDashboard(); renderRedeems();
+      if(!redeemResult.success) showToast(redeemResult.message||'โหลด Redeem Log ไม่สำเร็จ','error');
+    }
+    function renderDashboard(){
+      document.getElementById('statUsers').textContent=users.length.toLocaleString('th-TH');
+      document.getElementById('statPending').textContent=redeems.filter(x=>statusOf(x.Status).key==='PENDING').length.toLocaleString('th-TH');
+      document.getElementById('statDelivered').textContent=redeems.filter(x=>statusOf(x.Status).key==='DELIVERED').length.toLocaleString('th-TH');
+      document.getElementById('statStock').textContent=rewards.reduce((sum,x)=>sum+n(x.RemainingQty),0).toLocaleString('th-TH');
+    }
+    function filteredRedeems(){
+      const q=document.getElementById('searchInput').value.trim().toLowerCase();
+      const filter=document.getElementById('statusFilter').value;
+      return redeems.filter(x=>{
+        const matchesStatus=filter==='ALL'||statusOf(x.Status).key===filter;
+        const haystack=[x.RedeemID,x.EmpID,x.Firstname,x.Lastname,x.RewardName].join(' ').toLowerCase();
+        return matchesStatus && (!q||haystack.includes(q));
+      }).sort((a,b)=>new Date(b.Date)-new Date(a.Date));
+    }
+    function renderRedeems(){
+      const body=document.getElementById('redeemRows'); const list=filteredRedeems(); body.replaceChildren();
+      if(!list.length){ const row=document.createElement('tr'); const cell=document.createElement('td'); cell.colSpan=7; cell.className='empty'; cell.textContent='ไม่พบรายการ'; row.appendChild(cell); body.appendChild(row); return; }
+      list.forEach(item=>{
+        const st=statusOf(item.Status); const row=document.createElement('tr');
+        const values=[item.RedeemID||'—',`${item.EmpID||'—'}\n${item.Firstname||''} ${item.Lastname||''}`,item.RewardName||'—',n(item.PointUsed).toLocaleString('th-TH'),dateTime(item.Date)];
+        values.forEach((value,index)=>{ const td=document.createElement('td'); td.textContent=value; if(index===0)td.className='primary-cell'; td.style.whiteSpace=index===1?'pre-line':''; row.appendChild(td); });
+        const statusTd=document.createElement('td'); const badge=document.createElement('span'); badge.className=`status ${st.cls}`; badge.textContent=st.label; statusTd.appendChild(badge); row.appendChild(statusTd);
+        const actionTd=document.createElement('td'); const group=document.createElement('div'); group.className='action-group';
+        if(st.key==='PENDING'){ group.append(actionButton('อนุมัติ','primary',()=>openAction(item,'APPROVED')),actionButton('ยกเลิก','',()=>openAction(item,'REJECTED'))); }
+        if(st.key==='APPROVED'){ group.append(actionButton('ส่งมอบแล้ว','success',()=>openAction(item,'DELIVERED')),actionButton('ยกเลิก','',()=>openAction(item,'REJECTED'))); }
+        if(!group.children.length) group.textContent='—'; actionTd.appendChild(group); row.appendChild(actionTd); body.appendChild(row);
+      });
+    }
+    function actionButton(text,cls,handler){ const b=document.createElement('button'); b.type='button'; b.className=`action-btn ${cls}`; b.textContent=text; b.addEventListener('click',handler); return b; }
+    function openAction(item,status){
+      if(!adminNameInput.value.trim()){ adminNameInput.focus(); showToast('กรุณาระบุชื่อผู้ดำเนินการ','error'); return; }
+      selected=item; selectedStatus=status; const labels={APPROVED:'อนุมัติรายการ',DELIVERED:'ยืนยันการส่งมอบ',REJECTED:'ยกเลิกและคืนคะแนน'};
+      document.getElementById('modalTitle').textContent=labels[status];
+      document.getElementById('modalCopy').textContent=status==='REJECTED'?'ระบบจะคืนคะแนนให้ User และคืน Stock อัตโนมัติ':'กรุณาตรวจสอบรายการก่อนยืนยัน';
+      document.getElementById('modalSummary').textContent=`${item.RedeemID} · ${item.EmpID} · ${item.RewardName} · ${n(item.PointUsed).toLocaleString('th-TH')} pts`;
+      document.getElementById('adminNote').value=status==='APPROVED'?'อนุมัติแล้ว กรุณาติดต่อทีมงานเพื่อรับรางวัล':'';
+      document.getElementById('actionModal').classList.add('visible'); setTimeout(()=>document.getElementById('adminNote').focus(),0);
+    }
+    function closeModal(){ if(saving)return; document.getElementById('actionModal').classList.remove('visible'); selected=null; selectedStatus=''; }
+    async function saveAction(){
+      if(!selected||saving)return; saving=true; const btn=document.getElementById('confirmBtn'); btn.disabled=true; btn.textContent='กำลังบันทึก...';
+      const result=await api('adminUpdateRedeemStatus',{redeemId:selected.RedeemID,status:selectedStatus,adminName:adminNameInput.value.trim(),adminNote:document.getElementById('adminNote').value.trim()});
+      saving=false; btn.disabled=false; btn.textContent='ยืนยัน';
+      if(!result.success){ showToast(result.message||'บันทึกไม่สำเร็จ','error'); return; }
+      closeModal(); showToast('อัปเดตสถานะสำเร็จ','success'); await loadAll();
+    }
+    document.querySelectorAll('.admin-nav button[data-view]').forEach(button=>button.addEventListener('click',()=>{
+      document.querySelectorAll('.admin-nav button').forEach(x=>x.classList.remove('active')); button.classList.add('active');
+      document.querySelectorAll('.view').forEach(x=>x.classList.remove('active')); document.getElementById(button.dataset.view+'View').classList.add('active');
+      document.getElementById('pageName').textContent=button.dataset.view==='dashboard'?'Dashboard':'Redeem Management';
+    }));
+    document.getElementById('searchInput').addEventListener('input',renderRedeems);
+    document.getElementById('statusFilter').addEventListener('change',renderRedeems);
+    document.getElementById('refreshBtn').addEventListener('click',loadAll);
+    document.getElementById('cancelBtn').addEventListener('click',closeModal);
+    document.getElementById('confirmBtn').addEventListener('click',saveAction);
+    document.getElementById('actionModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+    loadAll();
+  </script>
+</body>
+</html>
