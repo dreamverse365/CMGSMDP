@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CMG SMDP — Admin Courses</title>
+  <title>CMG SMDP — Admin Test Management</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/app.css">
@@ -130,6 +130,9 @@
     .course-layout { display:grid; grid-template-columns:minmax(300px,.72fr) minmax(0,1.28fr); gap:18px; align-items:start; }
     .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     .course-actions { display:flex; gap:6px; }
+    .subsection { margin-top:22px; }
+    .test-controls { display:grid; grid-template-columns:1fr 160px auto; gap:10px; margin-top:16px; }
+    .test-controls select { min-height:42px; padding:8px 11px; border:1px solid var(--border); border-radius:9px; background:var(--surface-2); }
     .empty { padding: 48px 20px; color: var(--text-3); text-align: center; }
     .modal { display:none; position:fixed; inset:0; z-index:300; align-items:center; justify-content:center; padding:20px; background:rgba(0,0,0,.55); backdrop-filter:blur(5px); }
     .modal.visible { display:flex; }
@@ -282,6 +285,19 @@
             </form>
             <div class="panel"><div class="bulk-head"><div><h2>รายการหลักสูตร</h2><p class="panel-copy">ข้อมูลจากชีต Courses</p></div><button class="refresh-btn" id="courseRefresh" type="button">รีเฟรช</button></div><div class="table-wrap" style="margin-top:14px"><table style="min-width:720px"><thead><tr><th>COURSE</th><th>DATE / TIME</th><th>LOCATION</th><th>FORMAT</th><th>JOURNEY</th><th>ACTION</th></tr></thead><tbody id="courseRows"><tr><td colspan="6" class="empty">กำลังโหลด...</td></tr></tbody></table></div></div>
           </div>
+          <div class="course-layout subsection">
+            <form class="panel" id="questionForm">
+              <div class="eyebrow">QUESTION EDITOR</div><h2 id="questionFormTitle">เพิ่มคำถาม</h2><p class="panel-copy">คำตอบที่ถูกต้องต้องเลือก A, B, C หรือ D</p>
+              <div class="form-row"><div class="form-field"><label for="questionCourse">หลักสูตร</label><select id="questionCourse" required style="width:100%;min-height:46px;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--surface-2)"></select></div><div class="form-field"><label for="questionType">ประเภท</label><select id="questionType" style="width:100%;min-height:46px;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--surface-2)"><option value="pre">Pre-test</option><option value="post">Post-test</option></select></div></div>
+              <div class="form-row"><div class="form-field"><label for="questionNo">ข้อที่</label><input id="questionNo" type="number" min="1" max="100" required></div><div class="form-field"><label for="questionPoint">Point Reward ของชุด</label><input id="questionPoint" type="number" min="0" step="0.01" required></div></div>
+              <div class="form-field"><label for="questionText">คำถาม</label><textarea id="questionText" required></textarea></div>
+              <div class="form-field"><label for="choiceA">ตัวเลือก A</label><input id="choiceA" required></div><div class="form-field"><label for="choiceB">ตัวเลือก B</label><input id="choiceB" required></div><div class="form-field"><label for="choiceC">ตัวเลือก C</label><input id="choiceC" required></div><div class="form-field"><label for="choiceD">ตัวเลือก D</label><input id="choiceD" required></div>
+              <div class="form-field"><label for="correctAnswer">เฉลย</label><select id="correctAnswer" style="width:100%;min-height:46px;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--surface-2)"><option>A</option><option>B</option><option>C</option><option>D</option></select></div>
+              <button class="generate-btn" id="questionSaveBtn" type="submit">บันทึกคำถาม</button><button class="secondary-btn" id="questionCancelBtn" type="button" hidden style="margin-top:8px">ยกเลิกการแก้ไข</button>
+            </form>
+            <div class="panel"><div class="bulk-head"><div><h2>คลังข้อสอบ</h2><p class="panel-copy">เลือกหลักสูตรและประเภทข้อสอบเพื่อกรองรายการ</p></div><button class="refresh-btn" id="testRefresh" type="button">รีเฟรช</button></div><div class="test-controls"><select id="testCourseFilter"><option value="ALL">ทุกหลักสูตร</option></select><select id="testTypeFilter"><option value="ALL">Pre + Post</option><option value="pre">Pre-test</option><option value="post">Post-test</option></select><button class="refresh-btn" id="clearTestFilter" type="button">ล้างตัวกรอง</button></div><div class="table-wrap" style="margin-top:14px"><table style="min-width:780px"><thead><tr><th>COURSE</th><th>TYPE</th><th>NO.</th><th>QUESTION</th><th>ANSWER</th><th>POINT</th><th>ACTION</th></tr></thead><tbody id="questionRows"><tr><td colspan="7" class="empty">กำลังโหลด...</td></tr></tbody></table></div></div>
+          </div>
+          <div class="panel subsection"><div class="bulk-head"><div><div class="eyebrow">TEST ANALYTICS</div><h2>ผลการทำข้อสอบ</h2><p class="panel-copy">ตรวจสอบคะแนน จำนวนข้อ และ Point ที่ User ได้รับ</p></div></div><div class="toolbar" style="margin-top:14px"><input id="resultSearch" type="search" placeholder="ค้นหา Employee ID หรือ Course ID"><select id="resultType"><option value="ALL">ทุกประเภท</option><option value="pre">Pre-test</option><option value="post">Post-test</option></select></div><div class="table-wrap"><table><thead><tr><th>EMPLOYEE</th><th>COURSE</th><th>TYPE</th><th>SCORE</th><th>POINT EARNED</th><th>DATE</th></tr></thead><tbody id="resultRows"><tr><td colspan="6" class="empty">กำลังโหลด...</td></tr></tbody></table></div></div>
         </section>
       </main>
     </div>
@@ -295,7 +311,7 @@
   <script src="../js/config.js"></script>
   <script>
     const ADMIN_NAME_KEY = 'cmg_admin_operator';
-    let users = [], rewards = [], redeems = [], rankings = [], courses = [], coursesLoaded = false, editingCourseId = '', selected = null, selectedStatus = '', saving = false, lastQr = null, pointUser = null, bulkPreviewData = null;
+    let users = [], rewards = [], redeems = [], rankings = [], courses = [], questions = [], testResults = [], coursesLoaded = false, testsLoaded = false, editingCourseId = '', editingQuestionKey = '', selected = null, selectedStatus = '', saving = false, lastQr = null, pointUser = null, bulkPreviewData = null;
     const statusMap = {
       PENDING: { label:'รอตรวจสอบ', cls:'pending' }, APPROVED:{ label:'อนุมัติแล้ว', cls:'approved' },
       DELIVERED:{ label:'ส่งมอบแล้ว', cls:'delivered' }, REJECTED:{ label:'ยกเลิก', cls:'rejected' }
@@ -368,7 +384,7 @@
       document.querySelectorAll('.view').forEach(x=>x.classList.remove('active')); document.getElementById(button.dataset.view+'View').classList.add('active');
       const pageNames={dashboard:'Dashboard',redeem:'Redeem Management',qr:'QR Point Generator',points:'Point Management',ranking:'Ranking Management',courses:'Courses & Calendar'};
       document.getElementById('pageName').textContent=pageNames[button.dataset.view]||'Admin Control';
-      if(button.dataset.view==='courses'&&!coursesLoaded) loadCourses();
+      if(button.dataset.view==='courses'){ if(!coursesLoaded) loadCourses(); if(!testsLoaded) loadTestManagement(); }
     }));
     async function createQr(event){
       event.preventDefault();
@@ -494,7 +510,7 @@
       document.getElementById('courseRows').innerHTML='<tr><td colspan="6" class="empty">กำลังโหลด...</td></tr>';
       const result=await api('adminGetCourseManagement');
       if(!result.success){ showToast(result.message||'โหลดหลักสูตรไม่สำเร็จ','error'); return; }
-      courses=Array.isArray(result.courses)?result.courses:[]; coursesLoaded=true; renderCourses();
+      courses=Array.isArray(result.courses)?result.courses:[]; coursesLoaded=true; renderCourses(); fillCourseOptions();
     }
     function renderCourses(){
       const body=document.getElementById('courseRows'); body.replaceChildren();
@@ -522,6 +538,29 @@
       if(!confirm(`ยืนยันลบ ${item.CourseID} ${item.CourseName}?\nข้อมูล Questions และ TestResults จะไม่ถูกลบ`))return;
       const result=await api('adminDeleteCourseManaged',{courseId:item.CourseID,adminName:adminNameInput.value.trim()});if(!result.success){showToast(result.message||'ลบไม่สำเร็จ','error');return;}showToast('ลบหลักสูตรแล้ว','success');if(editingCourseId===item.CourseID)resetCourseForm();await loadCourses();
     }
+    function normalizeType(value){return String(value||'').trim().toLowerCase().replace(/[\s_-]*test$/,'');}
+    function fillCourseOptions(){
+      const selects=[document.getElementById('questionCourse'),document.getElementById('testCourseFilter')];
+      selects.forEach((select,index)=>{const current=select.value;select.replaceChildren();if(index===1)select.add(new Option('ทุกหลักสูตร','ALL'));courses.forEach(c=>select.add(new Option(`${c.CourseID} — ${c.CourseName}`,c.CourseID)));if([...select.options].some(o=>o.value===current))select.value=current;});
+    }
+    async function loadTestManagement(){
+      const result=await api('adminGetTestManagement');if(!result.success){showToast(result.message||'โหลดข้อมูลข้อสอบไม่สำเร็จ','error');return;}
+      questions=Array.isArray(result.questions)?result.questions:[];testResults=Array.isArray(result.results)?result.results:[];testsLoaded=true;renderQuestions();renderTestResults();
+    }
+    function renderQuestions(){
+      const course=document.getElementById('testCourseFilter').value||'ALL',type=document.getElementById('testTypeFilter').value;const list=questions.filter(q=>(course==='ALL'||String(q.CourseID)===course)&&(type==='ALL'||normalizeType(q.TestType)===type)).sort((a,b)=>String(a.CourseID).localeCompare(String(b.CourseID))||normalizeType(a.TestType).localeCompare(normalizeType(b.TestType))||n(a.QuestionNo)-n(b.QuestionNo));
+      const body=document.getElementById('questionRows');body.replaceChildren();if(!list.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=7;td.className='empty';td.textContent='ไม่พบคำถาม';tr.appendChild(td);body.appendChild(tr);return;}
+      list.forEach(item=>{const tr=document.createElement('tr');[item.CourseID,normalizeType(item.TestType).toUpperCase(),item.QuestionNo,item.Question,item.CorrectAnswer,n(item.PointReward).toLocaleString('th-TH')].forEach((value,index)=>{const td=document.createElement('td');td.textContent=value||'—';if(index===3)td.style.minWidth='250px';tr.appendChild(td);});const td=document.createElement('td'),group=document.createElement('div');group.className='course-actions';group.append(actionButton('แก้ไข','primary',()=>editQuestion(item)),actionButton('ลบ','',()=>deleteQuestion(item)));td.appendChild(group);tr.appendChild(td);body.appendChild(tr);});
+    }
+    function editQuestion(item){
+      editingQuestionKey=`${item.CourseID}|${normalizeType(item.TestType)}|${item.QuestionNo}`;document.getElementById('questionFormTitle').textContent='แก้ไขคำถาม';document.getElementById('questionCourse').value=item.CourseID;document.getElementById('questionCourse').disabled=true;document.getElementById('questionType').value=normalizeType(item.TestType);document.getElementById('questionType').disabled=true;document.getElementById('questionNo').value=item.QuestionNo;document.getElementById('questionNo').readOnly=true;document.getElementById('questionPoint').value=item.PointReward;document.getElementById('questionText').value=item.Question||'';['A','B','C','D'].forEach(x=>document.getElementById('choice'+x).value=item['Choice'+x]||'');document.getElementById('correctAnswer').value=String(item.CorrectAnswer||'A').toUpperCase();document.getElementById('questionCancelBtn').hidden=false;
+    }
+    function resetQuestionForm(){editingQuestionKey='';document.getElementById('questionForm').reset();document.getElementById('questionCourse').disabled=false;document.getElementById('questionType').disabled=false;document.getElementById('questionNo').readOnly=false;document.getElementById('questionFormTitle').textContent='เพิ่มคำถาม';document.getElementById('questionCancelBtn').hidden=true;}
+    async function saveQuestion(event){
+      event.preventDefault();const adminName=adminNameInput.value.trim();if(!adminName){adminNameInput.focus();showToast('กรุณาระบุชื่อผู้ดำเนินการ','error');return;}const data={courseId:document.getElementById('questionCourse').value,testType:document.getElementById('questionType').value,questionNo:Number(document.getElementById('questionNo').value),question:document.getElementById('questionText').value.trim(),choiceA:document.getElementById('choiceA').value.trim(),choiceB:document.getElementById('choiceB').value.trim(),choiceC:document.getElementById('choiceC').value.trim(),choiceD:document.getElementById('choiceD').value.trim(),correctAnswer:document.getElementById('correctAnswer').value,pointReward:Number(document.getElementById('questionPoint').value),adminName};const btn=document.getElementById('questionSaveBtn');btn.disabled=true;btn.textContent='กำลังบันทึก...';const result=await api('adminSaveQuestion',data);btn.disabled=false;btn.textContent='บันทึกคำถาม';if(!result.success){showToast(result.message||'บันทึกไม่สำเร็จ','error');return;}showToast(editingQuestionKey?'แก้ไขคำถามแล้ว':'เพิ่มคำถามแล้ว','success');resetQuestionForm();await loadTestManagement();
+    }
+    async function deleteQuestion(item){if(!adminNameInput.value.trim()){adminNameInput.focus();showToast('กรุณาระบุชื่อผู้ดำเนินการ','error');return;}if(!confirm(`ยืนยันลบ ${item.CourseID} ${normalizeType(item.TestType).toUpperCase()} ข้อ ${item.QuestionNo}?`))return;const result=await api('adminDeleteQuestion',{courseId:item.CourseID,testType:normalizeType(item.TestType),questionNo:item.QuestionNo,adminName:adminNameInput.value.trim()});if(!result.success){showToast(result.message||'ลบไม่สำเร็จ','error');return;}showToast('ลบคำถามแล้ว','success');resetQuestionForm();await loadTestManagement();}
+    function renderTestResults(){const q=document.getElementById('resultSearch').value.trim().toLowerCase(),type=document.getElementById('resultType').value;const list=testResults.filter(x=>(!q||[x.EmpID,x.CourseID].join(' ').toLowerCase().includes(q))&&(type==='ALL'||normalizeType(x.TestType)===type)).sort((a,b)=>new Date(b.Date)-new Date(a.Date));const body=document.getElementById('resultRows');body.replaceChildren();if(!list.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=6;td.className='empty';td.textContent='ยังไม่มีผลสอบ';tr.appendChild(td);body.appendChild(tr);return;}list.forEach(x=>{const tr=document.createElement('tr');[x.EmpID,x.CourseID,normalizeType(x.TestType).toUpperCase(),`${n(x.Score)}/${n(x.TotalQuestions)}`,n(x.PointEarned).toLocaleString('th-TH'),dateTime(x.Date)].forEach((v,i)=>{const td=document.createElement('td');td.textContent=v||'—';if(i===0)td.className='primary-cell';tr.appendChild(td);});body.appendChild(tr);});}
     document.getElementById('searchInput').addEventListener('input',renderRedeems);
     document.getElementById('statusFilter').addEventListener('change',renderRedeems);
     document.getElementById('refreshBtn').addEventListener('click',loadAll);
@@ -543,6 +582,14 @@
     document.getElementById('courseForm').addEventListener('submit',saveCourse);
     document.getElementById('courseCancelBtn').addEventListener('click',resetCourseForm);
     document.getElementById('courseRefresh').addEventListener('click',loadCourses);
+    document.getElementById('questionForm').addEventListener('submit',saveQuestion);
+    document.getElementById('questionCancelBtn').addEventListener('click',resetQuestionForm);
+    document.getElementById('testRefresh').addEventListener('click',loadTestManagement);
+    document.getElementById('testCourseFilter').addEventListener('change',renderQuestions);
+    document.getElementById('testTypeFilter').addEventListener('change',renderQuestions);
+    document.getElementById('clearTestFilter').addEventListener('click',()=>{document.getElementById('testCourseFilter').value='ALL';document.getElementById('testTypeFilter').value='ALL';renderQuestions();});
+    document.getElementById('resultSearch').addEventListener('input',renderTestResults);
+    document.getElementById('resultType').addEventListener('change',renderTestResults);
     document.getElementById('actionModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
     loadAll();
   </script>
