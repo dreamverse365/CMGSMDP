@@ -385,6 +385,353 @@
       .card { padding: 28px 22px; }
       .brand__logo { font-size: 26px; }
     }
+    /* ============================================================
+   CMG LOGIN — LIGHT THEME OVERRIDE
+   วางไว้ท้าย <style> ก่อน </style>
+   ============================================================ */
+
+html,
+body {
+  min-height: 100%;
+  background: #f5f5f5;
+  color: var(--text);
+}
+
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* ── BACKGROUND ─────────────────────────────────────────── */
+.bg-layer {
+  background:
+    radial-gradient(
+      ellipse 65% 45% at 85% 5%,
+      rgba(186,43,43,0.09) 0%,
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 50% 45% at 10% 95%,
+      rgba(201,168,76,0.08) 0%,
+      transparent 65%
+    ),
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #f7f7f7 55%,
+      #f2f2f2 100%
+    );
+}
+
+/* ลายเส้นบางด้านหลัง */
+.bg-layer::after {
+  background-image: repeating-linear-gradient(
+    -55deg,
+    transparent,
+    transparent 80px,
+    rgba(186,43,43,0.025) 80px,
+    rgba(186,43,43,0.025) 81px
+  );
+}
+
+/* ── PAGE LAYOUT ────────────────────────────────────────── */
+.page {
+  min-height: 100dvh;
+  height: auto;
+
+  padding:
+    max(36px, env(safe-area-inset-top, 0px))
+    20px
+    max(28px, env(safe-area-inset-bottom, 0px));
+
+  justify-content: center;
+}
+
+/* ── BRAND ──────────────────────────────────────────────── */
+.brand {
+  margin-bottom: 34px;
+}
+
+.brand__eyebrow {
+  color: var(--brand);
+}
+
+.brand__logo {
+  color: #252525;
+}
+
+.brand__logo span {
+  color: var(--brand);
+}
+
+.brand__sub {
+  color: var(--text-2);
+}
+
+.brand__divider {
+  width: 44px;
+  height: 2px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--gold),
+    transparent
+  );
+}
+
+/* ── LOGIN CARD ─────────────────────────────────────────── */
+.card {
+  background: rgba(255,255,255,0.96);
+  border: 1px solid rgba(25,25,25,0.09);
+
+  box-shadow:
+    0 0 0 1px rgba(186,43,43,0.025),
+    0 22px 60px rgba(25,25,25,0.10),
+    0 1px 0 rgba(255,255,255,0.90) inset;
+}
+
+.card__title {
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* แถบสีแดงด้านบนการ์ด */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 32px;
+  right: 32px;
+
+  height: 3px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--brand),
+    transparent
+  );
+
+  border-radius: 0 0 4px 4px;
+}
+
+.card {
+  position: relative;
+}
+
+/* ── FORM LABEL ─────────────────────────────────────────── */
+.field__label {
+  color: var(--text-2);
+}
+
+/* ── INPUT ──────────────────────────────────────────────── */
+input {
+  color: var(--text);
+  background: #f5f5f5;
+  border: 1px solid rgba(25,25,25,0.11);
+
+  box-shadow: none;
+}
+
+input::placeholder {
+  color: #a0a0a0;
+}
+
+input:hover {
+  background: #ffffff;
+  border-color: rgba(25,25,25,0.18);
+}
+
+input:focus {
+  color: var(--text);
+  background: #ffffff;
+  border-color: var(--brand);
+
+  box-shadow:
+    0 0 0 3px rgba(186,43,43,0.10);
+}
+
+/* Input icon */
+.field__icon {
+  color: #969696;
+}
+
+.field__input-wrap:focus-within .field__icon {
+  color: var(--brand);
+}
+
+/* ── LOGIN BUTTON ───────────────────────────────────────── */
+.btn-login {
+  min-height: 50px;
+
+  color: #ffffff;
+
+  background: linear-gradient(
+    135deg,
+    var(--brand) 0%,
+    var(--brand-light) 100%
+  );
+
+  box-shadow:
+    0 9px 22px rgba(186,43,43,0.22);
+
+  transition:
+    background 0.2s,
+    box-shadow 0.2s,
+    opacity 0.2s,
+    transform 0.15s;
+}
+
+.btn-login:hover {
+  opacity: 1;
+
+  background: linear-gradient(
+    135deg,
+    var(--brand-hover) 0%,
+    var(--brand) 100%
+  );
+
+  box-shadow:
+    0 11px 26px rgba(186,43,43,0.27);
+}
+
+.btn-login:active {
+  transform: scale(0.98);
+}
+
+.btn-login:disabled {
+  color: #ffffff;
+  background: #c98a8a;
+  box-shadow: none;
+  opacity: 0.72;
+}
+
+/* Loading spinner */
+.btn-login__spinner {
+  border-color: rgba(255,255,255,0.38);
+  border-top-color: #ffffff;
+}
+
+/* ── ERROR MESSAGE ──────────────────────────────────────── */
+.error-msg {
+  color: var(--error);
+  background: var(--error-soft);
+  border-color: rgba(186,43,43,0.22);
+}
+
+input.input--error {
+  background: #fffafa;
+  border-color: var(--error);
+}
+
+/* ── FOOTER ─────────────────────────────────────────────── */
+.hint {
+  color: var(--text-3);
+}
+
+/* ── TOAST ──────────────────────────────────────────────── */
+.toast {
+  color: var(--text);
+  background: rgba(255,255,255,0.98);
+  border-color: var(--border);
+
+  box-shadow:
+    0 12px 34px rgba(25,25,25,0.13);
+}
+
+.toast--success {
+  color: var(--success);
+  background: var(--success-soft);
+  border-color: rgba(38,117,81,0.25);
+}
+
+.toast--error {
+  color: var(--error);
+  background: var(--error-soft);
+  border-color: rgba(186,43,43,0.25);
+}
+
+/* ── FIRST LOGIN OVERLAY ────────────────────────────────── */
+.overlay {
+  background: rgba(25,25,25,0.50);
+}
+
+.overlay__card {
+  color: var(--text);
+  background: #ffffff;
+  border-color: var(--border);
+
+  box-shadow:
+    0 32px 80px rgba(25,25,25,0.22);
+}
+
+.overlay__icon {
+  color: var(--brand);
+  background: var(--brand-soft);
+  border-color: rgba(186,43,43,0.20);
+}
+
+.overlay__icon svg {
+  color: var(--brand);
+}
+
+.overlay__title {
+  color: var(--text);
+}
+
+.overlay__body,
+.overlay__point-label {
+  color: var(--text-2);
+}
+
+/* คะแนนยังคงเป็นทอง */
+.overlay__point {
+  color: var(--gold-dark);
+}
+
+.btn-confirm {
+  color: #ffffff;
+
+  background: linear-gradient(
+    135deg,
+    var(--brand) 0%,
+    var(--brand-light) 100%
+  );
+
+  box-shadow:
+    0 9px 22px rgba(186,43,43,0.20);
+}
+
+.btn-confirm:hover {
+  opacity: 1;
+
+  background: linear-gradient(
+    135deg,
+    var(--brand-hover) 0%,
+    var(--brand) 100%
+  );
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 420px) {
+  .page {
+    padding-inline: 18px;
+  }
+
+  .brand {
+    margin-bottom: 28px;
+  }
+
+  .card {
+    padding: 28px 22px;
+  }
+
+  .card::before {
+    left: 22px;
+    right: 22px;
+  }
+}
   </style>
 </head>
 <body>
