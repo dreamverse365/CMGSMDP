@@ -16,8 +16,8 @@
   color: var(--text);
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow-x: hidden;   /* ← เปลี่ยน overflow: hidden */
+  overflow-y: auto;     /* ← เพิ่ม */
 }
 
     /* ── BACKGROUND ─────────────────────────── */
@@ -44,14 +44,14 @@
 
     /* ── LAYOUT ─────────────────────────────── */
     .page {
-      position: relative; z-index: 1;
-      height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 24px 20px;
-    }
+  position: relative; z-index: 1;
+  min-height: 100dvh;    /* ← เปลี่ยนจาก height เป็น min-height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+}
 
     /* ── BRAND MARK ─────────────────────────── */
     .brand {
@@ -423,19 +423,6 @@ body {
     rgba(186,43,43,0.025) 81px
   );
 }
-
-/* ── PAGE LAYOUT ────────────────────────────────────────── */
-.page {
-  min-height: 100dvh;
-  height: auto;
-  padding:
-    max(24px, env(safe-area-inset-top, 0px))
-    20px
-    max(24px, env(safe-area-inset-bottom, 0px));
-  justify-content: center;
-  align-items: center;
-}
-
 /* ── BRAND ──────────────────────────────────────────────── */
 .brand {
   margin-bottom: 24px;
