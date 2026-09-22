@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CMG SMDP — Admin Test Management</title>
+  <title>CMG SMDP — Admin Rewards & Stock</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/app.css">
@@ -180,7 +180,7 @@
         <button data-view="points"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M8.5 9.5c0-1.4 1.5-2.5 3.5-2.5s3.5 1 3.5 2.5-1.4 2.2-3.5 2.5-3.5 1.1-3.5 2.5S10 17 12 17s3.5-1.1 3.5-2.5" stroke-linecap="round"/></svg>Point Management</button>
         <button data-view="ranking"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 20V10h4v10M14 20V4h4v16M3 20h18" stroke-linecap="round" stroke-linejoin="round"/></svg>Ranking</button>
         <button data-view="courses"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18" stroke-linecap="round"/></svg>Courses & Tests</button>
-        <button disabled>Rewards & Stock <span class="coming">NEXT</span></button>
+        <button data-view="rewards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 12v8H4v-8M2 7h20v5H2zM12 20V7M12 7H8.5A2.5 2.5 0 1 1 11 4.5L12 7Zm0 0h3.5A2.5 2.5 0 1 0 13 4.5L12 7Z" stroke-linecap="round" stroke-linejoin="round"/></svg>Rewards & Stock</button>
         <button disabled>Users & Reports <span class="coming">NEXT</span></button>
       </nav>
     </aside>
@@ -202,7 +202,7 @@
             <div class="module-card"><h2>Point Management</h2><p>ค้นหาพนักงาน เพิ่ม ลด และตรวจสอบประวัติคะแนน</p><span class="module-status ready">พร้อมใช้งาน</span></div>
             <div class="module-card"><h2>Ranking Management</h2><p>ดูอันดับคะแนนรวมทั้งหมด ค้นหาและกรองตาม Brand</p><span class="module-status ready">พร้อมใช้งาน</span></div>
             <div class="module-card"><h2>Courses & Calendar</h2><p>เพิ่ม แก้ไข และลบข้อมูลหลักสูตรที่แสดงฝั่ง User</p><span class="module-status ready">พร้อมใช้งาน</span></div>
-            <div class="module-card"><h2>Rewards & Stock</h2><p>จัดการของรางวัล คะแนนที่ใช้ และจำนวนคงเหลือ</p><span class="module-status">รอพัฒนา</span></div>
+            <div class="module-card"><h2>Rewards & Stock</h2><p>จัดการของรางวัล คะแนนที่ใช้ และจำนวนคงเหลือ</p><span class="module-status ready">พร้อมใช้งาน</span></div>
             <div class="module-card"><h2>Reports</h2><p>สรุปและดาวน์โหลดข้อมูลทั้งหมดเป็น Excel</p><span class="module-status">รอพัฒนา</span></div>
           </div>
         </section>
@@ -299,6 +299,22 @@
           </div>
           <div class="panel subsection"><div class="bulk-head"><div><div class="eyebrow">TEST ANALYTICS</div><h2>ผลการทำข้อสอบ</h2><p class="panel-copy">ตรวจสอบคะแนน จำนวนข้อ และ Point ที่ User ได้รับ</p></div></div><div class="toolbar" style="margin-top:14px"><input id="resultSearch" type="search" placeholder="ค้นหา Employee ID หรือ Course ID"><select id="resultType"><option value="ALL">ทุกประเภท</option><option value="pre">Pre-test</option><option value="post">Post-test</option></select></div><div class="table-wrap"><table><thead><tr><th>EMPLOYEE</th><th>COURSE</th><th>TYPE</th><th>SCORE</th><th>POINT EARNED</th><th>DATE</th></tr></thead><tbody id="resultRows"><tr><td colspan="6" class="empty">กำลังโหลด...</td></tr></tbody></table></div></div>
         </section>
+
+        <section class="view" id="rewardsView">
+          <div class="intro"><div class="eyebrow">REWARD INVENTORY</div><h1>Rewards & Stock</h1><p>จัดการรายการของรางวัล Point ที่ใช้ และจำนวน Stock คงเหลือ</p></div>
+          <div class="stat-grid" style="margin-bottom:18px"><div class="stat-card"><div class="stat-label">REWARD ITEMS</div><div class="stat-value" id="rewardItemCount">0</div></div><div class="stat-card"><div class="stat-label">TOTAL STOCK</div><div class="stat-value" id="rewardTotalStock">0</div></div><div class="stat-card"><div class="stat-label">REMAINING</div><div class="stat-value" id="rewardRemaining">0</div></div><div class="stat-card is-alert"><div class="stat-label">LOW / OUT OF STOCK</div><div class="stat-value" id="rewardLowStock">0</div></div></div>
+          <div class="course-layout">
+            <form class="panel" id="rewardForm">
+              <h2 id="rewardFormTitle">เพิ่มของรางวัล</h2><p class="panel-copy">การแก้ Total Stock จะคำนวณจำนวนคงเหลือใหม่อัตโนมัติ</p>
+              <div class="form-field"><label for="rewardId">Reward ID</label><input id="rewardId" maxlength="30" placeholder="RWD100" required></div>
+              <div class="form-field"><label for="rewardName">ชื่อของรางวัล</label><input id="rewardName" maxlength="150" placeholder="Central Gift Card 100.-" required></div>
+              <div class="form-row"><div class="form-field"><label for="rewardCost">Point ที่ใช้</label><input id="rewardCost" type="number" min="1" step="1" required></div><div class="form-field"><label for="rewardTotalQty">Total Stock</label><input id="rewardTotalQty" type="number" min="0" step="1" required></div></div>
+              <div class="preview-box" id="rewardStockPreview" hidden><div class="preview-list" id="rewardStockText"></div></div>
+              <button class="generate-btn" id="rewardSaveBtn" type="submit">บันทึกของรางวัล</button><button class="secondary-btn" id="rewardCancelBtn" type="button" hidden style="margin-top:8px">ยกเลิกการแก้ไข</button>
+            </form>
+            <div class="panel"><div class="bulk-head"><div><h2>รายการของรางวัล</h2><p class="panel-copy">ข้อมูล Stock จากชีต Rewards</p></div><button class="refresh-btn" id="rewardRefresh" type="button">รีเฟรช</button></div><div class="table-wrap" style="margin-top:14px"><table style="min-width:760px"><thead><tr><th>REWARD</th><th>POINT COST</th><th>TOTAL</th><th>REDEEMED</th><th>REMAINING</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody id="rewardRows"><tr><td colspan="7" class="empty">กำลังโหลด...</td></tr></tbody></table></div></div>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -311,7 +327,7 @@
   <script src="../js/config.js"></script>
   <script>
     const ADMIN_NAME_KEY = 'cmg_admin_operator';
-    let users = [], rewards = [], redeems = [], rankings = [], courses = [], questions = [], testResults = [], coursesLoaded = false, testsLoaded = false, editingCourseId = '', editingQuestionKey = '', selected = null, selectedStatus = '', saving = false, lastQr = null, pointUser = null, bulkPreviewData = null;
+    let users = [], rewards = [], redeems = [], rankings = [], courses = [], questions = [], testResults = [], coursesLoaded = false, testsLoaded = false, rewardsManagedLoaded = false, editingCourseId = '', editingQuestionKey = '', editingRewardId = '', selected = null, selectedStatus = '', saving = false, lastQr = null, pointUser = null, bulkPreviewData = null;
     const statusMap = {
       PENDING: { label:'รอตรวจสอบ', cls:'pending' }, APPROVED:{ label:'อนุมัติแล้ว', cls:'approved' },
       DELIVERED:{ label:'ส่งมอบแล้ว', cls:'delivered' }, REJECTED:{ label:'ยกเลิก', cls:'rejected' }
@@ -382,9 +398,10 @@
     document.querySelectorAll('.admin-nav button[data-view]').forEach(button=>button.addEventListener('click',()=>{
       document.querySelectorAll('.admin-nav button').forEach(x=>x.classList.remove('active')); button.classList.add('active');
       document.querySelectorAll('.view').forEach(x=>x.classList.remove('active')); document.getElementById(button.dataset.view+'View').classList.add('active');
-      const pageNames={dashboard:'Dashboard',redeem:'Redeem Management',qr:'QR Point Generator',points:'Point Management',ranking:'Ranking Management',courses:'Courses & Calendar'};
+      const pageNames={dashboard:'Dashboard',redeem:'Redeem Management',qr:'QR Point Generator',points:'Point Management',ranking:'Ranking Management',courses:'Courses & Tests',rewards:'Rewards & Stock'};
       document.getElementById('pageName').textContent=pageNames[button.dataset.view]||'Admin Control';
       if(button.dataset.view==='courses'){ if(!coursesLoaded) loadCourses(); if(!testsLoaded) loadTestManagement(); }
+      if(button.dataset.view==='rewards'&&!rewardsManagedLoaded) loadRewardManagement();
     }));
     async function createQr(event){
       event.preventDefault();
@@ -561,6 +578,16 @@
     }
     async function deleteQuestion(item){if(!adminNameInput.value.trim()){adminNameInput.focus();showToast('กรุณาระบุชื่อผู้ดำเนินการ','error');return;}if(!confirm(`ยืนยันลบ ${item.CourseID} ${normalizeType(item.TestType).toUpperCase()} ข้อ ${item.QuestionNo}?`))return;const result=await api('adminDeleteQuestion',{courseId:item.CourseID,testType:normalizeType(item.TestType),questionNo:item.QuestionNo,adminName:adminNameInput.value.trim()});if(!result.success){showToast(result.message||'ลบไม่สำเร็จ','error');return;}showToast('ลบคำถามแล้ว','success');resetQuestionForm();await loadTestManagement();}
     function renderTestResults(){const q=document.getElementById('resultSearch').value.trim().toLowerCase(),type=document.getElementById('resultType').value;const list=testResults.filter(x=>(!q||[x.EmpID,x.CourseID].join(' ').toLowerCase().includes(q))&&(type==='ALL'||normalizeType(x.TestType)===type)).sort((a,b)=>new Date(b.Date)-new Date(a.Date));const body=document.getElementById('resultRows');body.replaceChildren();if(!list.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=6;td.className='empty';td.textContent='ยังไม่มีผลสอบ';tr.appendChild(td);body.appendChild(tr);return;}list.forEach(x=>{const tr=document.createElement('tr');[x.EmpID,x.CourseID,normalizeType(x.TestType).toUpperCase(),`${n(x.Score)}/${n(x.TotalQuestions)}`,n(x.PointEarned).toLocaleString('th-TH'),dateTime(x.Date)].forEach((v,i)=>{const td=document.createElement('td');td.textContent=v||'—';if(i===0)td.className='primary-cell';tr.appendChild(td);});body.appendChild(tr);});}
+    async function loadRewardManagement(){const result=await api('adminGetRewardManagement');if(!result.success){showToast(result.message||'โหลดของรางวัลไม่สำเร็จ','error');return;}rewards=Array.isArray(result.rewards)?result.rewards:[];rewardsManagedLoaded=true;renderRewardManagement();renderDashboard();}
+    function renderRewardManagement(){
+      document.getElementById('rewardItemCount').textContent=rewards.length.toLocaleString('th-TH');document.getElementById('rewardTotalStock').textContent=rewards.reduce((s,x)=>s+n(x.TotalQty),0).toLocaleString('th-TH');document.getElementById('rewardRemaining').textContent=rewards.reduce((s,x)=>s+n(x.RemainingQty),0).toLocaleString('th-TH');document.getElementById('rewardLowStock').textContent=rewards.filter(x=>n(x.RemainingQty)<=3).length.toLocaleString('th-TH');
+      const body=document.getElementById('rewardRows');body.replaceChildren();if(!rewards.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=7;td.className='empty';td.textContent='ยังไม่มีของรางวัล';tr.appendChild(td);body.appendChild(tr);return;}
+      rewards.forEach(item=>{const tr=document.createElement('tr');const name=document.createElement('td');name.className='primary-cell';name.textContent=`${item.RewardID||'—'}\n${item.RewardName||'—'}`;name.style.whiteSpace='pre-line';tr.appendChild(name);[n(item.PointCost),n(item.TotalQty),n(item.RedeemedQty),n(item.RemainingQty)].forEach((value,index)=>{const td=document.createElement('td');td.textContent=value.toLocaleString('th-TH');if(index===0)td.className='rank-point';tr.appendChild(td);});const statusTd=document.createElement('td'),badge=document.createElement('span'),remaining=n(item.RemainingQty);badge.className=`status ${remaining<=0?'rejected':remaining<=3?'pending':'delivered'}`;badge.textContent=remaining<=0?'หมด':remaining<=3?'ใกล้หมด':'พร้อมแลก';statusTd.appendChild(badge);tr.appendChild(statusTd);const actionTd=document.createElement('td'),group=document.createElement('div');group.className='course-actions';group.append(actionButton('แก้ไข','primary',()=>editReward(item)),actionButton('ลบ','',()=>deleteReward(item)));actionTd.appendChild(group);tr.appendChild(actionTd);body.appendChild(tr);});
+    }
+    function editReward(item){editingRewardId=String(item.RewardID);document.getElementById('rewardFormTitle').textContent='แก้ไขของรางวัล';document.getElementById('rewardId').value=item.RewardID;document.getElementById('rewardId').readOnly=true;document.getElementById('rewardName').value=item.RewardName||'';document.getElementById('rewardCost').value=item.PointCost;document.getElementById('rewardTotalQty').value=item.TotalQty;document.getElementById('rewardCancelBtn').hidden=false;document.getElementById('rewardStockPreview').hidden=false;document.getElementById('rewardStockText').textContent=`แลกแล้ว ${n(item.RedeemedQty)} ชิ้น · Total Stock ใหม่ต้องไม่น้อยกว่าจำนวนที่แลกแล้ว`;}
+    function resetRewardForm(){editingRewardId='';document.getElementById('rewardForm').reset();document.getElementById('rewardId').readOnly=false;document.getElementById('rewardFormTitle').textContent='เพิ่มของรางวัล';document.getElementById('rewardCancelBtn').hidden=true;document.getElementById('rewardStockPreview').hidden=true;}
+    async function saveReward(event){event.preventDefault();const adminName=adminNameInput.value.trim();if(!adminName){adminNameInput.focus();showToast('กรุณาระบุชื่อผู้ดำเนินการ','error');return;}const data={rewardId:document.getElementById('rewardId').value.trim().toUpperCase(),rewardName:document.getElementById('rewardName').value.trim(),pointCost:Number(document.getElementById('rewardCost').value),totalQty:Number(document.getElementById('rewardTotalQty').value),adminName};const btn=document.getElementById('rewardSaveBtn');btn.disabled=true;btn.textContent='กำลังบันทึก...';const result=await api('adminSaveReward',data);btn.disabled=false;btn.textContent='บันทึกของรางวัล';if(!result.success){showToast(result.message||'บันทึกไม่สำเร็จ','error');return;}showToast(editingRewardId?'แก้ไขของรางวัลแล้ว':'เพิ่มของรางวัลแล้ว','success');resetRewardForm();await loadRewardManagement();}
+    async function deleteReward(item){if(!adminNameInput.value.trim()){adminNameInput.focus();showToast('กรุณาระบุชื่อผู้ดำเนินการ','error');return;}if(!confirm(`ยืนยันลบ ${item.RewardName}?`))return;const result=await api('adminDeleteRewardManaged',{rewardId:item.RewardID,adminName:adminNameInput.value.trim()});if(!result.success){showToast(result.message||'ลบไม่สำเร็จ','error');return;}showToast('ลบของรางวัลแล้ว','success');resetRewardForm();await loadRewardManagement();}
     document.getElementById('searchInput').addEventListener('input',renderRedeems);
     document.getElementById('statusFilter').addEventListener('change',renderRedeems);
     document.getElementById('refreshBtn').addEventListener('click',loadAll);
@@ -590,6 +617,9 @@
     document.getElementById('clearTestFilter').addEventListener('click',()=>{document.getElementById('testCourseFilter').value='ALL';document.getElementById('testTypeFilter').value='ALL';renderQuestions();});
     document.getElementById('resultSearch').addEventListener('input',renderTestResults);
     document.getElementById('resultType').addEventListener('change',renderTestResults);
+    document.getElementById('rewardForm').addEventListener('submit',saveReward);
+    document.getElementById('rewardCancelBtn').addEventListener('click',resetRewardForm);
+    document.getElementById('rewardRefresh').addEventListener('click',loadRewardManagement);
     document.getElementById('actionModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
     loadAll();
   </script>
