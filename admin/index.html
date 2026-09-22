@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CMG SMDP — Admin Users & Reports</title>
+  <title>CMG SMDP — Admin Dashboard Analytics</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/app.css">
@@ -133,6 +133,10 @@
     .subsection { margin-top:22px; }
     .test-controls { display:grid; grid-template-columns:1fr 160px auto; gap:10px; margin-top:16px; }
     .test-controls select { min-height:42px; padding:8px 11px; border:1px solid var(--border); border-radius:9px; background:var(--surface-2); }
+    .dashboard-grid { display:grid; grid-template-columns:minmax(0,1.55fr) minmax(280px,.75fr); gap:16px; margin-top:20px; }
+    .chart-card { padding:20px; border:1px solid var(--border); border-radius:16px; background:#fff; box-shadow:0 7px 24px rgba(25,25,25,.045); }
+    .chart-wrap { position:relative; height:300px; margin-top:16px; }
+    .dashboard-ranking { margin-top:16px; }
     .empty { padding: 48px 20px; color: var(--text-3); text-align: center; }
     .modal { display:none; position:fixed; inset:0; z-index:300; align-items:center; justify-content:center; padding:20px; background:rgba(0,0,0,.55); backdrop-filter:blur(5px); }
     .modal.visible { display:flex; }
@@ -161,6 +165,7 @@
       .stat-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .module-grid { grid-template-columns:1fr 1fr; }
       .qr-grid { grid-template-columns:1fr; }
+      .dashboard-grid { grid-template-columns:1fr; }
     }
     @media(max-width:540px) {
       .operator label { display:none; }
@@ -192,19 +197,15 @@
           <div class="intro"><div class="eyebrow">CONTROL CENTER</div><h1>Dashboard</h1><p>ภาพรวมข้อมูลสำคัญของโครงการและรายการที่รอดำเนินการ</p></div>
           <div class="stat-grid">
             <div class="stat-card"><div class="stat-label">USERS</div><div class="stat-value" id="statUsers">—</div></div>
+            <div class="stat-card"><div class="stat-label">TOTAL POINT</div><div class="stat-value" id="statTotalPoints">—</div></div>
             <div class="stat-card is-alert"><div class="stat-label">PENDING REDEEM</div><div class="stat-value" id="statPending">—</div></div>
-            <div class="stat-card"><div class="stat-label">DELIVERED</div><div class="stat-value" id="statDelivered">—</div></div>
             <div class="stat-card"><div class="stat-label">REWARD STOCK</div><div class="stat-value" id="statStock">—</div></div>
           </div>
-          <div class="module-grid">
-            <div class="module-card"><h2>Redeem Management</h2><p>อนุมัติ ส่งมอบ หรือยกเลิกพร้อมคืนคะแนนและ Stock</p><span class="module-status ready">พร้อมใช้งาน</span></div>
-            <div class="module-card"><h2>QR Point Generator</h2><p>สร้าง QR รับคะแนน กำหนดอายุและเหตุผลการให้คะแนน</p><span class="module-status ready">พร้อมใช้งาน</span></div>
-            <div class="module-card"><h2>Point Management</h2><p>ค้นหาพนักงาน เพิ่ม ลด และตรวจสอบประวัติคะแนน</p><span class="module-status ready">พร้อมใช้งาน</span></div>
-            <div class="module-card"><h2>Ranking Management</h2><p>ดูอันดับคะแนนรวมทั้งหมด ค้นหาและกรองตาม Brand</p><span class="module-status ready">พร้อมใช้งาน</span></div>
-            <div class="module-card"><h2>Courses & Calendar</h2><p>เพิ่ม แก้ไข และลบข้อมูลหลักสูตรที่แสดงฝั่ง User</p><span class="module-status ready">พร้อมใช้งาน</span></div>
-            <div class="module-card"><h2>Rewards & Stock</h2><p>จัดการของรางวัล คะแนนที่ใช้ และจำนวนคงเหลือ</p><span class="module-status ready">พร้อมใช้งาน</span></div>
-            <div class="module-card"><h2>Users & Reports</h2><p>ตรวจสอบรายชื่อและดาวน์โหลดข้อมูลโครงการเป็น Excel</p><span class="module-status ready">พร้อมใช้งาน</span></div>
+          <div class="dashboard-grid">
+            <div class="chart-card"><div class="eyebrow">LEARNING PERFORMANCE</div><h2>คะแนนเฉลี่ย Pre-test vs Post-test</h2><p class="panel-copy">แสดงค่าเฉลี่ยเป็นเปอร์เซ็นต์ของแต่ละหลักสูตร</p><div class="chart-wrap"><canvas id="testScoreChart" role="img" aria-label="กราฟเปรียบเทียบคะแนนเฉลี่ย Pre-test และ Post-test"></canvas></div></div>
+            <div class="chart-card"><div class="eyebrow">REWARD STATUS</div><h2>สถานะการ Redeem</h2><p class="panel-copy">สัดส่วนรายการตามสถานะปัจจุบัน</p><div class="chart-wrap"><canvas id="redeemStatusChart" role="img" aria-label="กราฟสถานะการแลกรางวัล"></canvas></div></div>
           </div>
+          <div class="chart-card dashboard-ranking"><div class="bulk-head"><div><div class="eyebrow">LEADERBOARD</div><h2>Ranking Top 5</h2><p class="panel-copy">อันดับจาก Total Point โดยไม่หักคะแนนหลัง Redeem</p></div><button class="refresh-btn" id="dashboardRefresh" type="button">รีเฟรช</button></div><div class="table-wrap" style="margin-top:14px"><table style="min-width:680px"><thead><tr><th>RANK</th><th>EMPLOYEE</th><th>BRAND</th><th>LOCATION</th><th>TOTAL POINT</th></tr></thead><tbody id="dashboardTopRows"><tr><td colspan="5" class="empty">กำลังโหลด...</td></tr></tbody></table></div></div>
         </section>
 
         <section class="view" id="redeemView">
@@ -331,11 +332,12 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="../js/config.js"></script>
   <script>
     const ADMIN_NAME_KEY = 'cmg_admin_operator';
-    let users = [], rewards = [], redeems = [], rankings = [], courses = [], questions = [], testResults = [], coursesLoaded = false, testsLoaded = false, rewardsManagedLoaded = false, editingCourseId = '', editingQuestionKey = '', editingRewardId = '', selected = null, selectedStatus = '', saving = false, lastQr = null, pointUser = null, bulkPreviewData = null;
+    let users = [], rewards = [], redeems = [], rankings = [], courses = [], questions = [], testResults = [], dashboardAnalytics = {courseTests:[]}, testScoreChart = null, redeemStatusChart = null, coursesLoaded = false, testsLoaded = false, rewardsManagedLoaded = false, editingCourseId = '', editingQuestionKey = '', editingRewardId = '', selected = null, selectedStatus = '', saving = false, lastQr = null, pointUser = null, bulkPreviewData = null;
     const statusMap = {
       PENDING: { label:'รอตรวจสอบ', cls:'pending' }, APPROVED:{ label:'อนุมัติแล้ว', cls:'approved' },
       DELIVERED:{ label:'ส่งมอบแล้ว', cls:'delivered' }, REJECTED:{ label:'ยกเลิก', cls:'rejected' }
@@ -349,20 +351,28 @@
     function statusOf(value){ const key=String(value||'PENDING').toUpperCase(); return { key, ...(statusMap[key]||statusMap.PENDING) }; }
 
     async function loadAll(){
-      const [userResult,rewardResult,redeemResult,rankingResult] = await Promise.all([api('adminGetAllUsers'),api('getRewards'),api('adminGetRedeemLog'),api('adminGetRanking')]);
+      const [userResult,rewardResult,redeemResult,rankingResult,analyticsResult] = await Promise.all([api('adminGetAllUsers'),api('getRewards'),api('adminGetRedeemLog'),api('adminGetRanking'),api('adminGetDashboardAnalytics')]);
       users = userResult.success && Array.isArray(userResult.users)?userResult.users:[];
       rewards = rewardResult.success && Array.isArray(rewardResult.rewards)?rewardResult.rewards:[];
       redeems = redeemResult.success && Array.isArray(redeemResult.log)?redeemResult.log:[];
       rankings = rankingResult.success && Array.isArray(rankingResult.ranking)?rankingResult.ranking:[];
+      dashboardAnalytics = analyticsResult.success?analyticsResult:{courseTests:[]};
       renderDashboard(); renderRedeems(); renderRanking(); fillRankingBrands();
       if(!redeemResult.success) showToast(redeemResult.message||'โหลด Redeem Log ไม่สำเร็จ','error');
     }
     function renderDashboard(){
       document.getElementById('statUsers').textContent=users.length.toLocaleString('th-TH');
+      document.getElementById('statTotalPoints').textContent=users.reduce((sum,x)=>sum+n(x.totalPoint),0).toLocaleString('th-TH');
       document.getElementById('statPending').textContent=redeems.filter(x=>statusOf(x.Status).key==='PENDING').length.toLocaleString('th-TH');
-      document.getElementById('statDelivered').textContent=redeems.filter(x=>statusOf(x.Status).key==='DELIVERED').length.toLocaleString('th-TH');
       document.getElementById('statStock').textContent=rewards.reduce((sum,x)=>sum+n(x.RemainingQty),0).toLocaleString('th-TH');
+      renderDashboardCharts();renderDashboardTop5();
     }
+    function renderDashboardCharts(){
+      if(typeof Chart==='undefined')return;const rows=dashboardAnalytics.courseTests||[];const labels=rows.map(x=>x.courseId);const common={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{usePointStyle:true,boxWidth:8,font:{family:'Inter'}}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y}%`}}},scales:{y:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'},grid:{color:'rgba(25,25,25,.06)'}},x:{grid:{display:false}}}};
+      if(testScoreChart)testScoreChart.destroy();testScoreChart=new Chart(document.getElementById('testScoreChart'),{type:'bar',data:{labels,datasets:[{label:'Pre-test',data:rows.map(x=>x.preAverage),backgroundColor:'#b9bec5',borderRadius:6},{label:'Post-test',data:rows.map(x=>x.postAverage),backgroundColor:'#ba2b2b',borderRadius:6}]},options:common});
+      const statusKeys=['PENDING','APPROVED','DELIVERED','REJECTED'];const counts=statusKeys.map(key=>redeems.filter(x=>statusOf(x.Status).key===key).length);if(redeemStatusChart)redeemStatusChart.destroy();redeemStatusChart=new Chart(document.getElementById('redeemStatusChart'),{type:'doughnut',data:{labels:['รอตรวจสอบ','อนุมัติแล้ว','ส่งมอบแล้ว','ยกเลิก'],datasets:[{data:counts,backgroundColor:['#c9a84c','#547ba5','#31865f','#ba2b2b'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8,padding:16,font:{family:'Noto Sans Thai'}}}}}});
+    }
+    function renderDashboardTop5(){const body=document.getElementById('dashboardTopRows');body.replaceChildren();const list=rankings.slice(0,5);if(!list.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=5;td.className='empty';td.textContent='ยังไม่มีข้อมูล Ranking';tr.appendChild(td);body.appendChild(tr);return;}list.forEach(item=>{const tr=document.createElement('tr'),rankTd=document.createElement('td'),rank=document.createElement('span');rank.className=`rank-no ${item.rank<=3?'top-'+item.rank:''}`;rank.textContent=item.rank;rankTd.appendChild(rank);tr.appendChild(rankTd);const employee=document.createElement('td');employee.className='primary-cell';employee.textContent=`${item.empId}\n${item.firstname||''} ${item.lastname||''}`;employee.style.whiteSpace='pre-line';tr.appendChild(employee);[item.brandName||'—',item.workLocation||'—'].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td);});const total=document.createElement('td');total.className='rank-point';total.textContent=n(item.totalPoint).toLocaleString('th-TH');tr.appendChild(total);body.appendChild(tr);});}
     function filteredRedeems(){
       const q=document.getElementById('searchInput').value.trim().toLowerCase();
       const filter=document.getElementById('statusFilter').value;
@@ -643,6 +653,7 @@
     document.getElementById('userReportBrand').addEventListener('change',renderUserReports);
     document.getElementById('reportRefresh').addEventListener('click',async()=>{await loadAll();renderUserReports();});
     document.getElementById('exportExcelBtn').addEventListener('click',exportExcel);
+    document.getElementById('dashboardRefresh').addEventListener('click',loadAll);
     document.getElementById('actionModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
     loadAll();
   </script>
