@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CMG SMDP — Admin Rewards & Stock</title>
+  <title>CMG SMDP — Admin Users & Reports</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/app.css">
@@ -181,7 +181,7 @@
         <button data-view="ranking"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 20V10h4v10M14 20V4h4v16M3 20h18" stroke-linecap="round" stroke-linejoin="round"/></svg>Ranking</button>
         <button data-view="courses"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18" stroke-linecap="round"/></svg>Courses & Tests</button>
         <button data-view="rewards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 12v8H4v-8M2 7h20v5H2zM12 20V7M12 7H8.5A2.5 2.5 0 1 1 11 4.5L12 7Zm0 0h3.5A2.5 2.5 0 1 0 13 4.5L12 7Z" stroke-linecap="round" stroke-linejoin="round"/></svg>Rewards & Stock</button>
-        <button disabled>Users & Reports <span class="coming">NEXT</span></button>
+        <button data-view="reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" stroke-linecap="round"/><circle cx="18" cy="6" r="3"/></svg>Users & Reports</button>
       </nav>
     </aside>
 
@@ -203,7 +203,7 @@
             <div class="module-card"><h2>Ranking Management</h2><p>ดูอันดับคะแนนรวมทั้งหมด ค้นหาและกรองตาม Brand</p><span class="module-status ready">พร้อมใช้งาน</span></div>
             <div class="module-card"><h2>Courses & Calendar</h2><p>เพิ่ม แก้ไข และลบข้อมูลหลักสูตรที่แสดงฝั่ง User</p><span class="module-status ready">พร้อมใช้งาน</span></div>
             <div class="module-card"><h2>Rewards & Stock</h2><p>จัดการของรางวัล คะแนนที่ใช้ และจำนวนคงเหลือ</p><span class="module-status ready">พร้อมใช้งาน</span></div>
-            <div class="module-card"><h2>Reports</h2><p>สรุปและดาวน์โหลดข้อมูลทั้งหมดเป็น Excel</p><span class="module-status">รอพัฒนา</span></div>
+            <div class="module-card"><h2>Users & Reports</h2><p>ตรวจสอบรายชื่อและดาวน์โหลดข้อมูลโครงการเป็น Excel</p><span class="module-status ready">พร้อมใช้งาน</span></div>
           </div>
         </section>
 
@@ -315,6 +315,13 @@
             <div class="panel"><div class="bulk-head"><div><h2>รายการของรางวัล</h2><p class="panel-copy">ข้อมูล Stock จากชีต Rewards</p></div><button class="refresh-btn" id="rewardRefresh" type="button">รีเฟรช</button></div><div class="table-wrap" style="margin-top:14px"><table style="min-width:760px"><thead><tr><th>REWARD</th><th>POINT COST</th><th>TOTAL</th><th>REDEEMED</th><th>REMAINING</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody id="rewardRows"><tr><td colspan="7" class="empty">กำลังโหลด...</td></tr></tbody></table></div></div>
           </div>
         </section>
+
+        <section class="view" id="reportsView">
+          <div class="intro"><div class="eyebrow">DATA & REPORTING</div><h1>Users & Reports</h1><p>ตรวจสอบข้อมูลผู้เข้าร่วมและดาวน์โหลดรายงานโครงการแบบหลาย Worksheet</p></div>
+          <div class="stat-grid" style="margin-bottom:18px"><div class="stat-card"><div class="stat-label">TOTAL USERS</div><div class="stat-value" id="reportUsers">0</div></div><div class="stat-card"><div class="stat-label">TOTAL POINT EARNED</div><div class="stat-value" id="reportPoints">0</div></div><div class="stat-card"><div class="stat-label">AVAILABLE POINT</div><div class="stat-value" id="reportAvailable">0</div></div><div class="stat-card"><div class="stat-label">REDEEMED POINT</div><div class="stat-value" id="reportRedeemed">0</div></div></div>
+          <div class="panel" style="margin-bottom:18px"><div class="bulk-head"><div><h2>ดาวน์โหลดรายงาน Excel</h2><p class="panel-copy">ประกอบด้วย Users, Point History, Redeem, Tests, QR, Courses, Questions และ Rewards โดยไม่ส่งออก PIN</p></div><button class="generate-btn" id="exportExcelBtn" type="button" style="width:auto;margin:0;padding:0 20px">ดาวน์โหลด Excel</button></div></div>
+          <div class="panel"><div class="bulk-head"><div><h2>รายชื่อ User</h2><p class="panel-copy">ข้อมูลจากชีต Users</p></div><button class="refresh-btn" id="reportRefresh" type="button">รีเฟรช</button></div><div class="toolbar" style="margin-top:14px"><input id="userReportSearch" type="search" placeholder="ค้นหา Employee ID หรือชื่อ"><select id="userReportBrand"><option value="ALL">ทุก Brand</option></select></div><div class="table-wrap"><table><thead><tr><th>EMPLOYEE</th><th>FUNCTION</th><th>BRAND</th><th>LOCATION</th><th>TOTAL</th><th>AVAILABLE</th><th>REDEEMED</th></tr></thead><tbody id="userReportRows"><tr><td colspan="7" class="empty">กำลังโหลด...</td></tr></tbody></table></div></div>
+        </section>
       </main>
     </div>
   </div>
@@ -324,6 +331,7 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="../js/config.js"></script>
   <script>
     const ADMIN_NAME_KEY = 'cmg_admin_operator';
@@ -398,10 +406,11 @@
     document.querySelectorAll('.admin-nav button[data-view]').forEach(button=>button.addEventListener('click',()=>{
       document.querySelectorAll('.admin-nav button').forEach(x=>x.classList.remove('active')); button.classList.add('active');
       document.querySelectorAll('.view').forEach(x=>x.classList.remove('active')); document.getElementById(button.dataset.view+'View').classList.add('active');
-      const pageNames={dashboard:'Dashboard',redeem:'Redeem Management',qr:'QR Point Generator',points:'Point Management',ranking:'Ranking Management',courses:'Courses & Tests',rewards:'Rewards & Stock'};
+      const pageNames={dashboard:'Dashboard',redeem:'Redeem Management',qr:'QR Point Generator',points:'Point Management',ranking:'Ranking Management',courses:'Courses & Tests',rewards:'Rewards & Stock',reports:'Users & Reports'};
       document.getElementById('pageName').textContent=pageNames[button.dataset.view]||'Admin Control';
       if(button.dataset.view==='courses'){ if(!coursesLoaded) loadCourses(); if(!testsLoaded) loadTestManagement(); }
       if(button.dataset.view==='rewards'&&!rewardsManagedLoaded) loadRewardManagement();
+      if(button.dataset.view==='reports') renderUserReports();
     }));
     async function createQr(event){
       event.preventDefault();
@@ -588,6 +597,16 @@
     function resetRewardForm(){editingRewardId='';document.getElementById('rewardForm').reset();document.getElementById('rewardId').readOnly=false;document.getElementById('rewardFormTitle').textContent='เพิ่มของรางวัล';document.getElementById('rewardCancelBtn').hidden=true;document.getElementById('rewardStockPreview').hidden=true;}
     async function saveReward(event){event.preventDefault();const adminName=adminNameInput.value.trim();if(!adminName){adminNameInput.focus();showToast('กรุณาระบุชื่อผู้ดำเนินการ','error');return;}const data={rewardId:document.getElementById('rewardId').value.trim().toUpperCase(),rewardName:document.getElementById('rewardName').value.trim(),pointCost:Number(document.getElementById('rewardCost').value),totalQty:Number(document.getElementById('rewardTotalQty').value),adminName};const btn=document.getElementById('rewardSaveBtn');btn.disabled=true;btn.textContent='กำลังบันทึก...';const result=await api('adminSaveReward',data);btn.disabled=false;btn.textContent='บันทึกของรางวัล';if(!result.success){showToast(result.message||'บันทึกไม่สำเร็จ','error');return;}showToast(editingRewardId?'แก้ไขของรางวัลแล้ว':'เพิ่มของรางวัลแล้ว','success');resetRewardForm();await loadRewardManagement();}
     async function deleteReward(item){if(!adminNameInput.value.trim()){adminNameInput.focus();showToast('กรุณาระบุชื่อผู้ดำเนินการ','error');return;}if(!confirm(`ยืนยันลบ ${item.RewardName}?`))return;const result=await api('adminDeleteRewardManaged',{rewardId:item.RewardID,adminName:adminNameInput.value.trim()});if(!result.success){showToast(result.message||'ลบไม่สำเร็จ','error');return;}showToast('ลบของรางวัลแล้ว','success');resetRewardForm();await loadRewardManagement();}
+    function fillUserReportBrands(){const select=document.getElementById('userReportBrand'),current=select.value;const brands=[...new Set(users.map(x=>String(x.brandName||'').trim()).filter(Boolean))].sort();select.replaceChildren(new Option('ทุก Brand','ALL'));brands.forEach(x=>select.add(new Option(x,x)));select.value=brands.includes(current)?current:'ALL';}
+    function renderUserReports(){
+      fillUserReportBrands();document.getElementById('reportUsers').textContent=users.length.toLocaleString('th-TH');document.getElementById('reportPoints').textContent=users.reduce((s,x)=>s+n(x.totalPoint),0).toLocaleString('th-TH');document.getElementById('reportAvailable').textContent=users.reduce((s,x)=>s+n(x.availablePoint),0).toLocaleString('th-TH');document.getElementById('reportRedeemed').textContent=users.reduce((s,x)=>s+n(x.redeemPoint),0).toLocaleString('th-TH');
+      const q=document.getElementById('userReportSearch').value.trim().toLowerCase(),brand=document.getElementById('userReportBrand').value;const list=users.filter(x=>(!q||[x.empId,x.firstname,x.lastname].join(' ').toLowerCase().includes(q))&&(brand==='ALL'||String(x.brandName)===brand));const body=document.getElementById('userReportRows');body.replaceChildren();if(!list.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=7;td.className='empty';td.textContent='ไม่พบข้อมูล User';tr.appendChild(td);body.appendChild(tr);return;}list.forEach(x=>{const tr=document.createElement('tr'),employee=document.createElement('td');employee.className='primary-cell';employee.textContent=`${x.empId}\n${x.firstname||''} ${x.lastname||''}`;employee.style.whiteSpace='pre-line';tr.appendChild(employee);[x.functionName||'—',x.brandName||'—',x.workLocation||'—',n(x.totalPoint),n(x.availablePoint),n(x.redeemPoint)].forEach((v,i)=>{const td=document.createElement('td');td.textContent=typeof v==='number'?v.toLocaleString('th-TH'):v;if(i===3)td.className='rank-point';tr.appendChild(td);});body.appendChild(tr);});
+    }
+    function safeSheetName(name){return String(name).replace(/[\\/?*\[\]:]/g,'_').slice(0,31);}
+    async function exportExcel(){
+      const btn=document.getElementById('exportExcelBtn');btn.disabled=true;btn.textContent='กำลังจัดทำไฟล์...';const result=await api('adminExportAllData');btn.disabled=false;btn.textContent='ดาวน์โหลด Excel';if(!result.success){showToast(result.message||'ดาวน์โหลดข้อมูลไม่สำเร็จ','error');return;}if(typeof XLSX==='undefined'){showToast('โหลดระบบ Excel ไม่สำเร็จ กรุณารีเฟรชหน้า','error');return;}
+      const workbook=XLSX.utils.book_new();const sheets=result.sheets||{};Object.entries(sheets).forEach(([name,rows])=>{const data=Array.isArray(rows)?rows:[];const sheet=XLSX.utils.json_to_sheet(data);if(sheet['!ref'])sheet['!cols']=Object.keys(data[0]||{}).map(key=>({wch:Math.min(45,Math.max(12,key.length+4))}));XLSX.utils.book_append_sheet(workbook,sheet,safeSheetName(name));});const stamp=new Date().toISOString().slice(0,10);XLSX.writeFile(workbook,`CMG_SMDP_Report_${stamp}.xlsx`);showToast('ดาวน์โหลดรายงานแล้ว','success');
+    }
     document.getElementById('searchInput').addEventListener('input',renderRedeems);
     document.getElementById('statusFilter').addEventListener('change',renderRedeems);
     document.getElementById('refreshBtn').addEventListener('click',loadAll);
@@ -620,6 +639,10 @@
     document.getElementById('rewardForm').addEventListener('submit',saveReward);
     document.getElementById('rewardCancelBtn').addEventListener('click',resetRewardForm);
     document.getElementById('rewardRefresh').addEventListener('click',loadRewardManagement);
+    document.getElementById('userReportSearch').addEventListener('input',renderUserReports);
+    document.getElementById('userReportBrand').addEventListener('change',renderUserReports);
+    document.getElementById('reportRefresh').addEventListener('click',async()=>{await loadAll();renderUserReports();});
+    document.getElementById('exportExcelBtn').addEventListener('click',exportExcel);
     document.getElementById('actionModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
     loadAll();
   </script>
