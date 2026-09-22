@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CMG SMDP — Admin Bulk Point</title>
+  <title>CMG SMDP — Admin Ranking</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/app.css">
@@ -121,6 +121,11 @@
     .preview-pill.ok { color:var(--success); background:rgba(49,134,95,.11); }
     .preview-pill.bad { color:var(--brand); background:var(--brand-dim); }
     .preview-list { margin-top:10px; color:var(--text-2); font-size:10px; line-height:1.7; word-break:break-word; }
+    .rank-no { width:30px; height:30px; display:grid; place-items:center; border-radius:50%; background:var(--surface-2); color:var(--text-2); font-weight:800; }
+    .rank-no.top-1 { background:var(--gold); color:#211900; }
+    .rank-no.top-2 { background:#d9dde2; color:#30343a; }
+    .rank-no.top-3 { background:#c88b62; color:#fff; }
+    .rank-point { color:var(--brand); font:800 15px/1 'Manrope'; }
     .empty { padding: 48px 20px; color: var(--text-3); text-align: center; }
     .modal { display:none; position:fixed; inset:0; z-index:300; align-items:center; justify-content:center; padding:20px; background:rgba(0,0,0,.55); backdrop-filter:blur(5px); }
     .modal.visible { display:flex; }
@@ -166,7 +171,7 @@
         <button data-view="redeem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7M22 7H2v5h20V7zM12 22V7"/></svg>Redeem</button>
         <button data-view="qr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><path d="M14 14h3v3h3v3h-6z"/></svg>QR Point</button>
         <button data-view="points"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M8.5 9.5c0-1.4 1.5-2.5 3.5-2.5s3.5 1 3.5 2.5-1.4 2.2-3.5 2.5-3.5 1.1-3.5 2.5S10 17 12 17s3.5-1.1 3.5-2.5" stroke-linecap="round"/></svg>Point Management</button>
-        <button disabled>Ranking <span class="coming">NEXT</span></button>
+        <button data-view="ranking"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 20V10h4v10M14 20V4h4v16M3 20h18" stroke-linecap="round" stroke-linejoin="round"/></svg>Ranking</button>
         <button disabled>Courses & Tests <span class="coming">NEXT</span></button>
         <button disabled>Rewards & Stock <span class="coming">NEXT</span></button>
         <button disabled>Users & Reports <span class="coming">NEXT</span></button>
@@ -188,7 +193,7 @@
             <div class="module-card"><h2>Redeem Management</h2><p>อนุมัติ ส่งมอบ หรือยกเลิกพร้อมคืนคะแนนและ Stock</p><span class="module-status ready">พร้อมใช้งาน</span></div>
             <div class="module-card"><h2>QR Point Generator</h2><p>สร้าง QR รับคะแนน กำหนดอายุและเหตุผลการให้คะแนน</p><span class="module-status ready">พร้อมใช้งาน</span></div>
             <div class="module-card"><h2>Point Management</h2><p>ค้นหาพนักงาน เพิ่ม ลด และตรวจสอบประวัติคะแนน</p><span class="module-status ready">พร้อมใช้งาน</span></div>
-            <div class="module-card"><h2>Course & Test</h2><p>จัดการหลักสูตร แบบทดสอบ และตรวจสอบผลการทำข้อสอบ</p><span class="module-status">รอพัฒนา</span></div>
+            <div class="module-card"><h2>Ranking Management</h2><p>ดูอันดับคะแนนรวมทั้งหมด ค้นหาและกรองตาม Brand</p><span class="module-status ready">พร้อมใช้งาน</span></div>
             <div class="module-card"><h2>Rewards & Stock</h2><p>จัดการของรางวัล คะแนนที่ใช้ และจำนวนคงเหลือ</p><span class="module-status">รอพัฒนา</span></div>
             <div class="module-card"><h2>Reports</h2><p>สรุปและดาวน์โหลดข้อมูลทั้งหมดเป็น Excel</p><span class="module-status">รอพัฒนา</span></div>
           </div>
@@ -250,6 +255,12 @@
             </form>
           </div>
         </section>
+
+        <section class="view" id="rankingView">
+          <div class="intro"><div class="eyebrow">PERFORMANCE OVERVIEW</div><h1>Ranking Management</h1><p>อันดับคำนวณจาก Total Point และไม่ลดลงเมื่อ User แลกรางวัล</p></div>
+          <div class="toolbar"><input id="rankingSearch" type="search" placeholder="ค้นหา Employee ID หรือชื่อ"><select id="rankingBrand"><option value="ALL">ทุก Brand</option></select><button class="refresh-btn" id="rankingRefresh" type="button">รีเฟรช</button></div>
+          <div class="table-wrap"><table><thead><tr><th>RANK</th><th>EMPLOYEE</th><th>BRAND</th><th>FUNCTION</th><th>LOCATION</th><th>TOTAL POINT</th><th>AVAILABLE</th></tr></thead><tbody id="rankingRows"><tr><td colspan="7" class="empty">กำลังโหลด...</td></tr></tbody></table></div>
+        </section>
       </main>
     </div>
   </div>
@@ -262,7 +273,7 @@
   <script src="../js/config.js"></script>
   <script>
     const ADMIN_NAME_KEY = 'cmg_admin_operator';
-    let users = [], rewards = [], redeems = [], selected = null, selectedStatus = '', saving = false, lastQr = null, pointUser = null, bulkPreviewData = null;
+    let users = [], rewards = [], redeems = [], rankings = [], selected = null, selectedStatus = '', saving = false, lastQr = null, pointUser = null, bulkPreviewData = null;
     const statusMap = {
       PENDING: { label:'รอตรวจสอบ', cls:'pending' }, APPROVED:{ label:'อนุมัติแล้ว', cls:'approved' },
       DELIVERED:{ label:'ส่งมอบแล้ว', cls:'delivered' }, REJECTED:{ label:'ยกเลิก', cls:'rejected' }
@@ -276,11 +287,12 @@
     function statusOf(value){ const key=String(value||'PENDING').toUpperCase(); return { key, ...(statusMap[key]||statusMap.PENDING) }; }
 
     async function loadAll(){
-      const [userResult,rewardResult,redeemResult] = await Promise.all([api('adminGetAllUsers'),api('getRewards'),api('adminGetRedeemLog')]);
+      const [userResult,rewardResult,redeemResult,rankingResult] = await Promise.all([api('adminGetAllUsers'),api('getRewards'),api('adminGetRedeemLog'),api('adminGetRanking')]);
       users = userResult.success && Array.isArray(userResult.users)?userResult.users:[];
       rewards = rewardResult.success && Array.isArray(rewardResult.rewards)?rewardResult.rewards:[];
       redeems = redeemResult.success && Array.isArray(redeemResult.log)?redeemResult.log:[];
-      renderDashboard(); renderRedeems();
+      rankings = rankingResult.success && Array.isArray(rankingResult.ranking)?rankingResult.ranking:[];
+      renderDashboard(); renderRedeems(); renderRanking(); fillRankingBrands();
       if(!redeemResult.success) showToast(redeemResult.message||'โหลด Redeem Log ไม่สำเร็จ','error');
     }
     function renderDashboard(){
@@ -332,7 +344,7 @@
     document.querySelectorAll('.admin-nav button[data-view]').forEach(button=>button.addEventListener('click',()=>{
       document.querySelectorAll('.admin-nav button').forEach(x=>x.classList.remove('active')); button.classList.add('active');
       document.querySelectorAll('.view').forEach(x=>x.classList.remove('active')); document.getElementById(button.dataset.view+'View').classList.add('active');
-      const pageNames={dashboard:'Dashboard',redeem:'Redeem Management',qr:'QR Point Generator',points:'Point Management'};
+      const pageNames={dashboard:'Dashboard',redeem:'Redeem Management',qr:'QR Point Generator',points:'Point Management',ranking:'Ranking Management'};
       document.getElementById('pageName').textContent=pageNames[button.dataset.view]||'Admin Control';
     }));
     async function createQr(event){
@@ -437,6 +449,23 @@
       const failed=(result.failed||[]).length; showToast(`สำเร็จ ${result.updated.length} คน${failed?` · ไม่สำเร็จ ${failed} คน`:''}`,failed?'info':'success',5000);
       document.getElementById('bulkPointForm').reset(); resetBulkPreview(); await loadAll();
     }
+    function fillRankingBrands(){
+      const select=document.getElementById('rankingBrand'); const current=select.value; const brands=[...new Set(rankings.map(x=>String(x.brandName||'').trim()).filter(Boolean))].sort();
+      select.replaceChildren(new Option('ทุก Brand','ALL')); brands.forEach(brand=>select.add(new Option(brand,brand))); select.value=brands.includes(current)?current:'ALL';
+    }
+    function renderRanking(){
+      const q=document.getElementById('rankingSearch').value.trim().toLowerCase(); const brand=document.getElementById('rankingBrand').value;
+      const list=rankings.filter(x=>{ const text=[x.empId,x.firstname,x.lastname].join(' ').toLowerCase(); return (!q||text.includes(q))&&(brand==='ALL'||String(x.brandName)===brand); });
+      const body=document.getElementById('rankingRows'); body.replaceChildren();
+      if(!list.length){ const tr=document.createElement('tr'),td=document.createElement('td'); td.colSpan=7;td.className='empty';td.textContent='ไม่พบข้อมูล Ranking';tr.appendChild(td);body.appendChild(tr);return; }
+      list.forEach(item=>{ const tr=document.createElement('tr');
+        const rankTd=document.createElement('td'),rank=document.createElement('span');rank.className=`rank-no ${item.rank<=3?'top-'+item.rank:''}`;rank.textContent=item.rank;rankTd.appendChild(rank);tr.appendChild(rankTd);
+        const employee=document.createElement('td');employee.className='primary-cell';employee.textContent=`${item.empId}\n${item.firstname||''} ${item.lastname||''}`;employee.style.whiteSpace='pre-line';tr.appendChild(employee);
+        [item.brandName||'—',item.functionName||'—',item.workLocation||'—'].forEach(value=>{const td=document.createElement('td');td.textContent=value;tr.appendChild(td);});
+        const total=document.createElement('td');total.className='rank-point';total.textContent=n(item.totalPoint).toLocaleString('th-TH');tr.appendChild(total);
+        const available=document.createElement('td');available.textContent=n(item.availablePoint).toLocaleString('th-TH');tr.appendChild(available);body.appendChild(tr);
+      });
+    }
     document.getElementById('searchInput').addEventListener('input',renderRedeems);
     document.getElementById('statusFilter').addEventListener('change',renderRedeems);
     document.getElementById('refreshBtn').addEventListener('click',loadAll);
@@ -452,6 +481,9 @@
     document.getElementById('bulkCheckBtn').addEventListener('click',previewBulk);
     document.getElementById('bulkPointForm').addEventListener('submit',submitBulk);
     document.getElementById('bulkEmpIds').addEventListener('input',resetBulkPreview);
+    document.getElementById('rankingSearch').addEventListener('input',renderRanking);
+    document.getElementById('rankingBrand').addEventListener('change',renderRanking);
+    document.getElementById('rankingRefresh').addEventListener('click',loadAll);
     document.getElementById('actionModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
     loadAll();
   </script>
