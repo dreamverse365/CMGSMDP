@@ -10,7 +10,7 @@
   <style>
     :root { --admin-sidebar: 236px; }
     * { box-sizing: border-box; }
-    body { padding: 0; font-family: 'Inter','Noto Sans Thai',sans-serif; background: #f5f5f5; }
+    body { padding: 0; font-family: 'Inter','Prompt',sans-serif; background: #f5f5f5; }
     button, input, select, textarea { font: inherit; }
     .admin-shell { min-height: 100vh; }
     .sidebar {
@@ -42,7 +42,7 @@
       background: rgba(255,255,255,.94); border-bottom: 1px solid var(--border);
       backdrop-filter: blur(16px);
     }
-    .page-name { color: var(--text); font: 800 16px/1.2 'Manrope','Noto Sans Thai'; }
+    .page-name { color: var(--text); font: 800 16px/1.2 'Manrope','Prompt'; }
     .operator { display: flex; align-items: center; gap: 9px; }
     .operator label { color: var(--text-3); font-size: 10px; }
     .operator input {
@@ -54,7 +54,7 @@
     .view.active { display: block; }
     .intro { margin-bottom: 22px; }
     .eyebrow { color: var(--brand); font: 700 10px/1 'Manrope'; letter-spacing: .18em; margin-bottom: 8px; }
-    h1 { color: var(--text); font: 800 28px/1.2 'Manrope','Noto Sans Thai'; }
+    h1 { color: var(--text); font: 800 28px/1.2 'Manrope','Prompt'; }
     .intro p { margin-top: 7px; color: var(--text-2); font-size: 13px; }
     .stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
     .stat-card { padding: 18px; border: 1px solid var(--border); border-radius: 16px; background: #fff; box-shadow: 0 7px 24px rgba(25,25,25,.045); }
@@ -88,7 +88,7 @@
     .action-btn.success { color: #fff; background: var(--success); border-color: var(--success); }
     .qr-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.82fr); gap:18px; align-items:start; }
     .panel { padding:22px; border:1px solid var(--border); border-radius:16px; background:#fff; box-shadow:0 7px 24px rgba(25,25,25,.045); }
-    .panel h2 { color:var(--text); font:800 16px/1.3 'Manrope','Noto Sans Thai'; }
+    .panel h2 { color:var(--text); font:800 16px/1.3 'Manrope','Prompt'; }
     .panel-copy { margin-top:6px; color:var(--text-3); font-size:11px; line-height:1.6; }
     .form-field { margin-top:18px; }
     .form-field label { display:block; margin-bottom:7px; color:var(--text-2); font-size:11px; font-weight:700; }
@@ -141,7 +141,7 @@
     .modal { display:none; position:fixed; inset:0; z-index:300; align-items:center; justify-content:center; padding:20px; background:rgba(0,0,0,.55); backdrop-filter:blur(5px); }
     .modal.visible { display:flex; }
     .modal-card { width:100%; max-width:460px; padding:24px; border-radius:18px; background:#fff; box-shadow:0 22px 70px rgba(0,0,0,.18); }
-    .modal-card h2 { color:var(--text); font:800 18px/1.3 'Manrope','Noto Sans Thai'; }
+    .modal-card h2 { color:var(--text); font:800 18px/1.3 'Manrope','Prompt'; }
     .modal-card p { margin-top:6px; color:var(--text-2); font-size:12px; line-height:1.55; }
     .modal-summary { padding:12px; margin:16px 0; border-radius:10px; background:var(--surface-2); color:var(--text-2); font-size:11px; line-height:1.7; }
     .field { margin-top:14px; }
@@ -370,7 +370,7 @@
     function renderDashboardCharts(){
       if(typeof Chart==='undefined')return;const rows=dashboardAnalytics.courseTests||[];const labels=rows.map(x=>x.courseId);const common={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{usePointStyle:true,boxWidth:8,font:{family:'Inter'}}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y}%`}}},scales:{y:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'},grid:{color:'rgba(25,25,25,.06)'}},x:{grid:{display:false}}}};
       if(testScoreChart)testScoreChart.destroy();testScoreChart=new Chart(document.getElementById('testScoreChart'),{type:'bar',data:{labels,datasets:[{label:'Pre-test',data:rows.map(x=>x.preAverage),backgroundColor:'#b9bec5',borderRadius:6},{label:'Post-test',data:rows.map(x=>x.postAverage),backgroundColor:'#ba2b2b',borderRadius:6}]},options:common});
-      const statusKeys=['PENDING','APPROVED','DELIVERED','REJECTED'];const counts=statusKeys.map(key=>redeems.filter(x=>statusOf(x.Status).key===key).length);if(redeemStatusChart)redeemStatusChart.destroy();redeemStatusChart=new Chart(document.getElementById('redeemStatusChart'),{type:'doughnut',data:{labels:['รอตรวจสอบ','อนุมัติแล้ว','ส่งมอบแล้ว','ยกเลิก'],datasets:[{data:counts,backgroundColor:['#c9a84c','#547ba5','#31865f','#ba2b2b'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8,padding:16,font:{family:'Noto Sans Thai'}}}}}});
+      const statusKeys=['PENDING','APPROVED','DELIVERED','REJECTED'];const counts=statusKeys.map(key=>redeems.filter(x=>statusOf(x.Status).key===key).length);if(redeemStatusChart)redeemStatusChart.destroy();redeemStatusChart=new Chart(document.getElementById('redeemStatusChart'),{type:'doughnut',data:{labels:['รอตรวจสอบ','อนุมัติแล้ว','ส่งมอบแล้ว','ยกเลิก'],datasets:[{data:counts,backgroundColor:['#c9a84c','#547ba5','#31865f','#ba2b2b'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8,padding:16,font:{family:'Prompt'}}}}}});
     }
     function renderDashboardTop5(){const body=document.getElementById('dashboardTopRows');body.replaceChildren();const list=rankings.slice(0,5);if(!list.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=5;td.className='empty';td.textContent='ยังไม่มีข้อมูล Ranking';tr.appendChild(td);body.appendChild(tr);return;}list.forEach(item=>{const tr=document.createElement('tr'),rankTd=document.createElement('td'),rank=document.createElement('span');rank.className=`rank-no ${item.rank<=3?'top-'+item.rank:''}`;rank.textContent=item.rank;rankTd.appendChild(rank);tr.appendChild(rankTd);const employee=document.createElement('td');employee.className='primary-cell';employee.textContent=`${item.empId}\n${item.firstname||''} ${item.lastname||''}`;employee.style.whiteSpace='pre-line';tr.appendChild(employee);[item.brandName||'—',item.workLocation||'—'].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td);});const total=document.createElement('td');total.className='rank-point';total.textContent=n(item.totalPoint).toLocaleString('th-TH');tr.appendChild(total);body.appendChild(tr);});}
     function filteredRedeems(){
