@@ -156,7 +156,6 @@
       .page-body { padding-inline: 16px; }
       .course-card__body { padding-inline: 16px; }
       .course-actions { padding-inline: 16px; }
-      .filter-tab { font-size: 10px; }
     }
   </style>
 </head>
@@ -264,51 +263,56 @@
       return item;
     }
 
-    function createTestButton(label, type, course) {
-  const button = document.createElement('button');
-
-  const completed =
-    type === 'pre'
-      ? course.PreTestCompleted === true
-      : course.PostTestCompleted === true;
-
-  button.type = 'button';
-  button.className = 'test-btn';
-
-  button.setAttribute(
-    'aria-label',
-    `${label} ${course.CourseName || ''}`
-  );
-
-  button.append(
-    icon(
-      '<path d="M8 3h8l4 4v14H4V3h4zM14 3v5h5M8 13h8M8 17h5" stroke-linecap="round" stroke-linejoin="round"/>'
-    ),
-    document.createTextNode(completed ? `${label} — ทำแล้ว` : label)
-  );
-
-  if (completed) {
-    button.classList.add('is-completed');
-    button.disabled = true;
-    button.setAttribute('aria-disabled', 'true');
-    return button;
-  }
-
-  button.addEventListener('click', () => {
-    const courseId = course.CourseID;
-
-    if (!courseId) {
-      showToast('ไม่พบรหัสหลักสูตร', 'error');
-      return;
+    function isCompleted(value) {
+      const normalized = String(value ?? '').trim().toLowerCase();
+      return value === true || value === 1 || normalized === 'true' || normalized === '1';
     }
 
-    window.location.href =
-      `test.html?course=${encodeURIComponent(courseId)}` +
-      `&type=${encodeURIComponent(type)}`;
-  });
+    function createTestButton(label, type, course) {
+      const button = document.createElement('button');
+      const completed = type === 'pre'
+        ? isCompleted(course.PreTestCompleted)
+        : isCompleted(course.PostTestCompleted);
 
-  return button;
-}
+      button.type = 'button';
+      button.className = 'test-btn';
+      button.setAttribute('aria-label', `${label} ${course.CourseName || ''}`);
+
+      if (completed) {
+        button.classList.add('is-completed');
+        button.disabled = true;
+        button.setAttribute('aria-disabled', 'true');
+        button.append(
+          icon(
+            '<path d="M5 12l4 4L19 6" stroke-linecap="round" stroke-linejoin="round"/>'
+          ),
+          document.createTextNode(`${label} — ทำแล้ว`)
+        );
+        return button;
+      }
+
+      button.append(
+        icon(
+          '<path d="M8 3h8l4 4v14H4V3h4zM14 3v5h5M8 13h8M8 17h5" stroke-linecap="round" stroke-linejoin="round"/>'
+        ),
+        document.createTextNode(label)
+      );
+
+      button.addEventListener('click', () => {
+        const courseId = course.CourseID;
+
+        if (!courseId) {
+          showToast('ไม่พบรหัสหลักสูตร', 'error');
+          return;
+        }
+
+        window.location.href =
+          `test.html?course=${encodeURIComponent(courseId)}` +
+          `&type=${encodeURIComponent(type)}`;
+      });
+
+      return button;
+    }
 
     function createCourseCard(course) {
       const date = parseCourseDate(course.Date);
@@ -386,7 +390,9 @@
     async function loadCourses() {
       const content = document.getElementById('courseContent');
       content.setAttribute('aria-busy', 'true');
-      const result = await api('getCourses');
+      const result = await api('getCourses', {
+        empId: session.empId
+      });
       if (!result.success) {
         renderError(result.message);
         return;
