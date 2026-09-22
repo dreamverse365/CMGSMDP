@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CMG SMDP — Admin Point Management</title>
+  <title>CMG SMDP — Admin Bulk Point</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/app.css">
@@ -93,6 +93,7 @@
     .form-field { margin-top:18px; }
     .form-field label { display:block; margin-bottom:7px; color:var(--text-2); font-size:11px; font-weight:700; }
     .form-field input { width:100%; min-height:46px; padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:var(--surface-2); color:var(--text); }
+    .form-field textarea { width:100%; min-height:118px; padding:11px 12px; border:1px solid var(--border); border-radius:10px; background:var(--surface-2); color:var(--text); resize:vertical; line-height:1.6; }
     .hint { display:block; margin-top:6px; color:var(--text-3); font-size:9px; }
     .generate-btn { width:100%; min-height:46px; margin-top:20px; border:1px solid var(--brand); border-radius:10px; background:var(--brand); color:#fff; font-weight:700; cursor:pointer; transition:background .2s,opacity .2s; }
     .generate-btn:hover { background:var(--brand-hover); }
@@ -109,6 +110,17 @@
     .qr-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
     .qr-actions button { min-height:42px; border:1px solid var(--border); border-radius:9px; background:#fff; color:var(--text-2); cursor:pointer; }
     .qr-actions .primary { border-color:var(--brand); background:var(--brand); color:#fff; }
+    .bulk-panel { margin-top:18px; }
+    .bulk-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+    .bulk-badge { flex:0 0 auto; padding:5px 9px; border-radius:99px; background:var(--brand-dim); color:var(--brand); font-size:9px; font-weight:800; }
+    .bulk-form-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(220px,.65fr); gap:16px; }
+    .preview-box { margin-top:16px; padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--surface-2); }
+    .preview-box[hidden] { display:none; }
+    .preview-summary { display:flex; flex-wrap:wrap; gap:8px; }
+    .preview-pill { padding:5px 9px; border-radius:99px; font-size:10px; font-weight:700; }
+    .preview-pill.ok { color:var(--success); background:rgba(49,134,95,.11); }
+    .preview-pill.bad { color:var(--brand); background:var(--brand-dim); }
+    .preview-list { margin-top:10px; color:var(--text-2); font-size:10px; line-height:1.7; word-break:break-word; }
     .empty { padding: 48px 20px; color: var(--text-3); text-align: center; }
     .modal { display:none; position:fixed; inset:0; z-index:300; align-items:center; justify-content:center; padding:20px; background:rgba(0,0,0,.55); backdrop-filter:blur(5px); }
     .modal.visible { display:flex; }
@@ -226,6 +238,17 @@
             </div>
             <div class="panel"><h2>ประวัติล่าสุด</h2><p class="panel-copy">แสดงรายการล่าสุดสูงสุด 20 รายการ</p><div id="pointHistory" style="margin-top:14px"></div></div>
           </div>
+          <div class="panel bulk-panel">
+            <div class="bulk-head"><div><div class="eyebrow">BULK OPERATION</div><h2>ให้ Point หลาย User</h2><p class="panel-copy">รองรับการคั่นด้วยเครื่องหมายจุลภาค เว้นวรรค หรือขึ้นบรรทัดใหม่</p></div><span class="bulk-badge">BULK POINT</span></div>
+            <form id="bulkPointForm">
+              <div class="bulk-form-grid">
+                <div class="form-field"><label for="bulkEmpIds">รายชื่อ Employee ID</label><textarea id="bulkEmpIds" placeholder="20000001, 20000002&#10;20000003" required></textarea><small class="hint">ระบบจะตัด ID ที่ซ้ำกันออกอัตโนมัติ</small></div>
+                <div><div class="form-field"><label for="bulkDelta">Point ต่อคน</label><input id="bulkDelta" type="number" step="0.01" placeholder="เช่น 5 หรือ -5" required></div><div class="form-field"><label for="bulkReason">เหตุผล</label><input id="bulkReason" maxlength="150" placeholder="เช่น เข้าร่วมกิจกรรม CMG01" required></div></div>
+              </div>
+              <div class="preview-box" id="bulkPreview" hidden><div class="preview-summary"><span class="preview-pill ok" id="bulkFound">พบ 0 คน</span><span class="preview-pill bad" id="bulkMissing">ไม่พบ 0 คน</span></div><div class="preview-list" id="bulkPreviewList"></div></div>
+              <div class="qr-actions"><button id="bulkCheckBtn" type="button">ตรวจสอบรายชื่อ</button><button class="primary" id="bulkSubmitBtn" type="submit" disabled>ยืนยันให้ Point</button></div>
+            </form>
+          </div>
         </section>
       </main>
     </div>
@@ -239,7 +262,7 @@
   <script src="../js/config.js"></script>
   <script>
     const ADMIN_NAME_KEY = 'cmg_admin_operator';
-    let users = [], rewards = [], redeems = [], selected = null, selectedStatus = '', saving = false, lastQr = null, pointUser = null;
+    let users = [], rewards = [], redeems = [], selected = null, selectedStatus = '', saving = false, lastQr = null, pointUser = null, bulkPreviewData = null;
     const statusMap = {
       PENDING: { label:'รอตรวจสอบ', cls:'pending' }, APPROVED:{ label:'อนุมัติแล้ว', cls:'approved' },
       DELIVERED:{ label:'ส่งมอบแล้ว', cls:'delivered' }, REJECTED:{ label:'ยกเลิก', cls:'rejected' }
@@ -387,6 +410,33 @@
       if(!result.success){ showToast(result.message||'บันทึกไม่สำเร็จ','error'); return; }
       document.getElementById('adjustPointForm').reset(); showToast('ปรับคะแนนสำเร็จ','success'); await searchPointUser(); await loadAll();
     }
+    function bulkIds(){ return [...new Set(document.getElementById('bulkEmpIds').value.split(/[\s,;]+/).map(x=>x.trim()).filter(Boolean))]; }
+    function resetBulkPreview(){ bulkPreviewData=null; document.getElementById('bulkPreview').hidden=true; document.getElementById('bulkSubmitBtn').disabled=true; }
+    async function previewBulk(){
+      const empIds=bulkIds(); if(!empIds.length){ showToast('กรุณากรอก Employee ID','error'); return; }
+      const btn=document.getElementById('bulkCheckBtn'); btn.disabled=true; btn.textContent='กำลังตรวจสอบ...';
+      const result=await api('adminPreviewBulkPoint',{empIds}); btn.disabled=false; btn.textContent='ตรวจสอบรายชื่อ';
+      if(!result.success){ showToast(result.message||'ตรวจสอบไม่สำเร็จ','error'); return; }
+      bulkPreviewData=result; document.getElementById('bulkPreview').hidden=false;
+      document.getElementById('bulkFound').textContent=`พบ ${result.found.length} คน`; document.getElementById('bulkMissing').textContent=`ไม่พบ ${result.missing.length} คน`;
+      const foundText=result.found.map(x=>`${x.empId} ${x.firstname||''} ${x.lastname||''}`.trim()).join(' · ');
+      const missingText=result.missing.length?`ไม่พบ: ${result.missing.join(', ')}`:'';
+      document.getElementById('bulkPreviewList').textContent=[foundText,missingText].filter(Boolean).join(' | ');
+      document.getElementById('bulkSubmitBtn').disabled=!result.found.length;
+    }
+    async function submitBulk(event){
+      event.preventDefault(); if(!bulkPreviewData||saving)return;
+      const adminName=adminNameInput.value.trim(); if(!adminName){ adminNameInput.focus(); showToast('กรุณาระบุชื่อผู้ดำเนินการ','error'); return; }
+      const delta=Number(document.getElementById('bulkDelta').value); const reason=document.getElementById('bulkReason').value.trim();
+      if(!Number.isFinite(delta)||delta===0){ showToast('Point ต้องไม่เท่ากับ 0','error'); return; } if(!reason){ showToast('กรุณาระบุเหตุผล','error'); return; }
+      const currentIds=bulkIds(); if(currentIds.join('|')!==(bulkPreviewData.requested||[]).join('|')){ resetBulkPreview(); showToast('รายชื่อมีการเปลี่ยนแปลง กรุณาตรวจสอบใหม่','error'); return; }
+      if(!confirm(`ยืนยันปรับ ${delta>0?'+':''}${delta} Point ให้ ${bulkPreviewData.found.length} คน?`))return;
+      const btn=document.getElementById('bulkSubmitBtn'); saving=true; btn.disabled=true; btn.textContent='กำลังบันทึก...';
+      const result=await api('adminBulkAdjustPoint',{empIds:currentIds,delta,reason,adminName}); saving=false; btn.textContent='ยืนยันให้ Point';
+      if(!result.success){ btn.disabled=false; showToast(result.message||'บันทึกไม่สำเร็จ','error'); return; }
+      const failed=(result.failed||[]).length; showToast(`สำเร็จ ${result.updated.length} คน${failed?` · ไม่สำเร็จ ${failed} คน`:''}`,failed?'info':'success',5000);
+      document.getElementById('bulkPointForm').reset(); resetBulkPreview(); await loadAll();
+    }
     document.getElementById('searchInput').addEventListener('input',renderRedeems);
     document.getElementById('statusFilter').addEventListener('change',renderRedeems);
     document.getElementById('refreshBtn').addEventListener('click',loadAll);
@@ -399,6 +449,9 @@
     document.getElementById('pointSearchBtn').addEventListener('click',searchPointUser);
     document.getElementById('pointEmpId').addEventListener('keydown',e=>{if(e.key==='Enter')searchPointUser();});
     document.getElementById('adjustPointForm').addEventListener('submit',adjustPoint);
+    document.getElementById('bulkCheckBtn').addEventListener('click',previewBulk);
+    document.getElementById('bulkPointForm').addEventListener('submit',submitBulk);
+    document.getElementById('bulkEmpIds').addEventListener('input',resetBulkPreview);
     document.getElementById('actionModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
     loadAll();
   </script>
