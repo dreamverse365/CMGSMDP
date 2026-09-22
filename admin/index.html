@@ -332,18 +332,4 @@
     function resetQr(){
       lastQr=null; document.getElementById('qrForm').reset(); document.getElementById('qrCode').replaceChildren();
       document.getElementById('qrResult').hidden=true; document.getElementById('qrPlaceholder').hidden=false; document.getElementById('qrPoint').focus();
-    }
-    document.getElementById('searchInput').addEventListener('input',renderRedeems);
-    document.getElementById('statusFilter').addEventListener('change',renderRedeems);
-    document.getElementById('refreshBtn').addEventListener('click',loadAll);
-    document.getElementById('cancelBtn').addEventListener('click',closeModal);
-    document.getElementById('confirmBtn').addEventListener('click',saveAction);
-    document.getElementById('qrForm').addEventListener('submit',createQr);
-    document.getElementById('copyQrBtn').addEventListener('click',copyQr);
-    document.getElementById('downloadQrBtn').addEventListener('click',downloadQr);
-    document.getElementById('newQrBtn').addEventListener('click',resetQr);
-    document.getElementById('actionModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
-    loadAll();
-  </script>
-</body>
-</html>
+
