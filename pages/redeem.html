@@ -183,6 +183,72 @@
       box-shadow: 0 8px 26px rgba(25,25,25,.055);
     }
 
+    .history-section { margin-top: 28px; }
+    .redeem-history { display: grid; gap: 10px; }
+    .redeem-history-card {
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      box-shadow: 0 6px 20px rgba(25,25,25,.045);
+    }
+    .history-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .history-reward-name {
+      color: var(--text);
+      font: 700 13px/1.45 'Manrope', 'Noto Sans Thai', sans-serif;
+    }
+    .history-date { color: var(--text-3); font-size: 10px; margin-top: 3px; }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      flex: 0 0 auto;
+      min-height: 24px;
+      padding: 4px 9px;
+      border-radius: 99px;
+      font-size: 9px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .status--pending { color: var(--gold-dark, #84651d); background: var(--gold-dim); }
+    .status--approved { color: var(--info); background: var(--info-soft, rgba(84,123,165,.10)); }
+    .status--delivered { color: var(--success); background: var(--success-soft, rgba(49,134,95,.10)); }
+    .status--rejected { color: var(--brand); background: var(--brand-dim); }
+    .history-detail {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 7px 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+    }
+    .history-detail span:nth-child(odd) { color: var(--text-3); }
+    .history-detail span:nth-child(even) { color: var(--text-2); font-weight: 600; text-align: right; }
+    .history-note {
+      padding: 10px 12px;
+      margin-top: 12px;
+      border-radius: 9px;
+      background: var(--surface-2);
+      color: var(--text-2);
+      font-size: 11px;
+      line-height: 1.55;
+    }
+    .history-empty {
+      padding: 24px;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-lg);
+      color: var(--text-3);
+      font-size: 12px;
+      text-align: center;
+    }
+
     .redeem-overlay {
       display: none;
       position: fixed;
@@ -306,6 +372,13 @@
         <div class="skeleton loading-card"></div>
       </div>
     </div>
+
+    <section class="history-section" aria-labelledby="historyTitle">
+      <p class="section-label" id="historyTitle">ประวัติการแลกรางวัลของฉัน</p>
+      <div id="redeemHistory" aria-live="polite" aria-busy="true">
+        <div class="skeleton" style="height:120px;border-radius:var(--radius-lg)"></div>
+      </div>
+    </section>
   </main>
 
   <nav class="bottom-nav" aria-label="เมนูหลัก">
@@ -371,6 +444,7 @@
     const currentEmpId = session?.empId || session?.EmpID || session?.employeeId || session?.EmployeeID || session?.user?.empId || '';
     const giftIconPath = '<path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7M22 7H2v5h20V7zM12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zm0 0h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>';
     let rewards = [];
+    let myRedeems = [];
     let availablePoint = 0;
     let selectedReward = null;
     let redeeming = false;
@@ -469,6 +543,89 @@
       document.getElementById('rewardError').textContent = message || 'กรุณาลองใหม่อีกครั้ง';
     }
 
+    function formatDateTime(value) {
+      if (!value) return '—';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return String(value);
+      return new Intl.DateTimeFormat('th-TH', {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      }).format(date);
+    }
+
+    function statusInfo(value) {
+      const status = String(value || 'PENDING').trim().toUpperCase();
+      const statuses = {
+        PENDING: { label: 'รอตรวจสอบ', className: 'status--pending' },
+        APPROVED: { label: 'อนุมัติแล้ว รอรับรางวัล', className: 'status--approved' },
+        DELIVERED: { label: 'ส่งมอบแล้ว', className: 'status--delivered' },
+        REJECTED: { label: 'รายการถูกยกเลิก', className: 'status--rejected' }
+      };
+      return statuses[status] || statuses.PENDING;
+    }
+
+    function renderRedeemHistory(errorMessage = '') {
+      const container = document.getElementById('redeemHistory');
+      container.setAttribute('aria-busy', 'false');
+
+      if (errorMessage) {
+        container.innerHTML = '<div class="history-empty" id="historyError"></div>';
+        document.getElementById('historyError').textContent = errorMessage;
+        return;
+      }
+      if (!myRedeems.length) {
+        container.innerHTML = '<div class="history-empty">ยังไม่มีประวัติการแลกรางวัล</div>';
+        return;
+      }
+
+      const list = document.createElement('div');
+      list.className = 'redeem-history';
+      myRedeems.forEach(item => {
+        const status = statusInfo(item.status);
+        const card = document.createElement('article');
+        card.className = 'redeem-history-card';
+
+        const top = document.createElement('div');
+        top.className = 'history-card-top';
+        const heading = document.createElement('div');
+        const name = document.createElement('div');
+        name.className = 'history-reward-name';
+        name.textContent = item.rewardName || 'ของรางวัล';
+        const date = document.createElement('div');
+        date.className = 'history-date';
+        date.textContent = formatDateTime(item.date);
+        heading.append(name, date);
+        const badge = document.createElement('span');
+        badge.className = `status-badge ${status.className}`;
+        badge.textContent = status.label;
+        top.append(heading, badge);
+
+        const detail = document.createElement('div');
+        detail.className = 'history-detail';
+        const rows = [
+          ['เลขอ้างอิง', item.redeemId || '—'],
+          ['คะแนนที่ใช้', `${formatPoint(item.pointUsed)} pts`]
+        ];
+        rows.forEach(([label, value]) => {
+          const labelElement = document.createElement('span');
+          labelElement.textContent = label;
+          const valueElement = document.createElement('span');
+          valueElement.textContent = value;
+          detail.append(labelElement, valueElement);
+        });
+        card.append(top, detail);
+
+        if (item.adminNote) {
+          const note = document.createElement('div');
+          note.className = 'history-note';
+          note.textContent = `หมายเหตุจาก Admin: ${item.adminNote}`;
+          card.appendChild(note);
+        }
+        list.appendChild(card);
+      });
+      container.replaceChildren(list);
+    }
+
     async function loadRedeemPage() {
       if (!currentEmpId) {
         Session.clear();
@@ -478,9 +635,10 @@
 
       const content = document.getElementById('rewardContent');
       content.setAttribute('aria-busy', 'true');
-      const [profileResult, rewardResult] = await Promise.all([
+      const [profileResult, rewardResult, historyResult] = await Promise.all([
         api('getUserProfile', { empId: currentEmpId }),
-        api('getRewards')
+        api('getRewards'),
+        api('getMyRedeems', { empId: currentEmpId })
       ]);
 
       if (!profileResult.success) {
@@ -497,6 +655,14 @@
       rewards = (Array.isArray(rewardResult.rewards) ? rewardResult.rewards : [])
         .filter(reward => isActiveReward(reward.IsActive));
       renderRewards();
+
+      if (historyResult.success) {
+        myRedeems = Array.isArray(historyResult.redeems) ? historyResult.redeems : [];
+        renderRedeemHistory();
+      } else {
+        myRedeems = [];
+        renderRedeemHistory(historyResult.message || 'โหลดประวัติการแลกรางวัลไม่สำเร็จ');
+      }
     }
 
     function openConfirm(reward) {
