@@ -389,7 +389,6 @@ body {
 body {
   overflow-x: hidden;
   overflow-y: auto;
-  padding-bottom: 0;
 }
 
 /* ── BACKGROUND ─────────────────────────────────────────── */
@@ -428,18 +427,17 @@ body {
 .page {
   min-height: 100dvh;
   height: auto;
-
   padding:
-    max(36px, env(safe-area-inset-top, 0px))
+    max(24px, env(safe-area-inset-top, 0px))
     20px
-    max(28px, env(safe-area-inset-bottom, 0px));
-
+    max(24px, env(safe-area-inset-bottom, 0px));
   justify-content: center;
+  align-items: center;
 }
 
 /* ── BRAND ──────────────────────────────────────────────── */
 .brand {
-  margin-bottom: 34px;
+  margin-bottom: 24px;
 }
 
 .brand__eyebrow {
@@ -469,7 +467,17 @@ body {
     transparent
   );
 }
-
+@media (max-height: 700px) {
+  .brand {
+    margin-bottom: 16px;
+  }
+  .brand__logo {
+    font-size: 24px;
+  }
+  .card {
+    padding: 24px 22px;
+  }
+}
 /* ── LOGIN CARD ─────────────────────────────────────────── */
 .card {
   background: rgba(255,255,255,0.96);
