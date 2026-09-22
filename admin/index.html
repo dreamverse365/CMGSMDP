@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CMG SMDP — Admin Ranking</title>
+  <title>CMG SMDP — Admin Courses</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/app.css">
@@ -98,6 +98,7 @@
     .generate-btn { width:100%; min-height:46px; margin-top:20px; border:1px solid var(--brand); border-radius:10px; background:var(--brand); color:#fff; font-weight:700; cursor:pointer; transition:background .2s,opacity .2s; }
     .generate-btn:hover { background:var(--brand-hover); }
     .generate-btn:disabled { opacity:.55; cursor:wait; }
+    .secondary-btn { width:100%; min-height:44px; border:1px solid var(--border); border-radius:10px; background:var(--surface-2); color:var(--text-2); cursor:pointer; }
     .qr-placeholder { min-height:350px; display:grid; place-items:center; text-align:center; color:var(--text-3); }
     .qr-placeholder svg { width:56px; height:56px; margin-bottom:12px; color:var(--surface-3); }
     .qr-result[hidden] { display:none; }
@@ -126,6 +127,9 @@
     .rank-no.top-2 { background:#d9dde2; color:#30343a; }
     .rank-no.top-3 { background:#c88b62; color:#fff; }
     .rank-point { color:var(--brand); font:800 15px/1 'Manrope'; }
+    .course-layout { display:grid; grid-template-columns:minmax(300px,.72fr) minmax(0,1.28fr); gap:18px; align-items:start; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .course-actions { display:flex; gap:6px; }
     .empty { padding: 48px 20px; color: var(--text-3); text-align: center; }
     .modal { display:none; position:fixed; inset:0; z-index:300; align-items:center; justify-content:center; padding:20px; background:rgba(0,0,0,.55); backdrop-filter:blur(5px); }
     .modal.visible { display:flex; }
@@ -172,7 +176,7 @@
         <button data-view="qr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><path d="M14 14h3v3h3v3h-6z"/></svg>QR Point</button>
         <button data-view="points"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M8.5 9.5c0-1.4 1.5-2.5 3.5-2.5s3.5 1 3.5 2.5-1.4 2.2-3.5 2.5-3.5 1.1-3.5 2.5S10 17 12 17s3.5-1.1 3.5-2.5" stroke-linecap="round"/></svg>Point Management</button>
         <button data-view="ranking"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 20V10h4v10M14 20V4h4v16M3 20h18" stroke-linecap="round" stroke-linejoin="round"/></svg>Ranking</button>
-        <button disabled>Courses & Tests <span class="coming">NEXT</span></button>
+        <button data-view="courses"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18" stroke-linecap="round"/></svg>Courses & Tests</button>
         <button disabled>Rewards & Stock <span class="coming">NEXT</span></button>
         <button disabled>Users & Reports <span class="coming">NEXT</span></button>
       </nav>
@@ -194,6 +198,7 @@
             <div class="module-card"><h2>QR Point Generator</h2><p>สร้าง QR รับคะแนน กำหนดอายุและเหตุผลการให้คะแนน</p><span class="module-status ready">พร้อมใช้งาน</span></div>
             <div class="module-card"><h2>Point Management</h2><p>ค้นหาพนักงาน เพิ่ม ลด และตรวจสอบประวัติคะแนน</p><span class="module-status ready">พร้อมใช้งาน</span></div>
             <div class="module-card"><h2>Ranking Management</h2><p>ดูอันดับคะแนนรวมทั้งหมด ค้นหาและกรองตาม Brand</p><span class="module-status ready">พร้อมใช้งาน</span></div>
+            <div class="module-card"><h2>Courses & Calendar</h2><p>เพิ่ม แก้ไข และลบข้อมูลหลักสูตรที่แสดงฝั่ง User</p><span class="module-status ready">พร้อมใช้งาน</span></div>
             <div class="module-card"><h2>Rewards & Stock</h2><p>จัดการของรางวัล คะแนนที่ใช้ และจำนวนคงเหลือ</p><span class="module-status">รอพัฒนา</span></div>
             <div class="module-card"><h2>Reports</h2><p>สรุปและดาวน์โหลดข้อมูลทั้งหมดเป็น Excel</p><span class="module-status">รอพัฒนา</span></div>
           </div>
@@ -261,6 +266,23 @@
           <div class="toolbar"><input id="rankingSearch" type="search" placeholder="ค้นหา Employee ID หรือชื่อ"><select id="rankingBrand"><option value="ALL">ทุก Brand</option></select><button class="refresh-btn" id="rankingRefresh" type="button">รีเฟรช</button></div>
           <div class="table-wrap"><table><thead><tr><th>RANK</th><th>EMPLOYEE</th><th>BRAND</th><th>FUNCTION</th><th>LOCATION</th><th>TOTAL POINT</th><th>AVAILABLE</th></tr></thead><tbody id="rankingRows"><tr><td colspan="7" class="empty">กำลังโหลด...</td></tr></tbody></table></div>
         </section>
+
+        <section class="view" id="coursesView">
+          <div class="intro"><div class="eyebrow">LEARNING OPERATIONS</div><h1>Courses & Calendar</h1><p>เพิ่มและแก้ไขข้อมูลหลักสูตรที่แสดงใน Calendar ของ User</p></div>
+          <div class="course-layout">
+            <form class="panel" id="courseForm">
+              <h2 id="courseFormTitle">เพิ่มหลักสูตร</h2><p class="panel-copy">Course ID ต้องตรงกับรหัสในชีต Questions เช่น CMG01</p>
+              <div class="form-field"><label for="courseId">Course ID</label><input id="courseId" maxlength="20" placeholder="CMG01" required></div>
+              <div class="form-field"><label for="courseName">ชื่อหลักสูตร</label><input id="courseName" maxlength="120" placeholder="People Manager" required></div>
+              <div class="form-row"><div class="form-field"><label for="courseDate">วันที่</label><input id="courseDate" type="date" required></div><div class="form-field"><label for="courseTime">เวลา</label><input id="courseTime" type="time" required></div></div>
+              <div class="form-field"><label for="courseLocation">สถานที่ / Meeting URL</label><input id="courseLocation" maxlength="160" placeholder="Training Room หรือ URL" required></div>
+              <div class="form-row"><div class="form-field"><label for="courseFormat">รูปแบบ</label><select id="courseFormat" style="width:100%;min-height:46px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface-2)"><option value="Classroom">Classroom</option><option value="Online">Online</option><option value="Hybrid">Hybrid</option></select></div><div class="form-field"><label for="courseJourney">Journey</label><input id="courseJourney" type="number" min="1" max="4" placeholder="1–4"></div></div>
+              <button class="generate-btn" id="courseSaveBtn" type="submit">บันทึกหลักสูตร</button>
+              <button class="secondary-btn" id="courseCancelBtn" type="button" hidden style="margin-top:8px">ยกเลิกการแก้ไข</button>
+            </form>
+            <div class="panel"><div class="bulk-head"><div><h2>รายการหลักสูตร</h2><p class="panel-copy">ข้อมูลจากชีต Courses</p></div><button class="refresh-btn" id="courseRefresh" type="button">รีเฟรช</button></div><div class="table-wrap" style="margin-top:14px"><table style="min-width:720px"><thead><tr><th>COURSE</th><th>DATE / TIME</th><th>LOCATION</th><th>FORMAT</th><th>JOURNEY</th><th>ACTION</th></tr></thead><tbody id="courseRows"><tr><td colspan="6" class="empty">กำลังโหลด...</td></tr></tbody></table></div></div>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -273,7 +295,7 @@
   <script src="../js/config.js"></script>
   <script>
     const ADMIN_NAME_KEY = 'cmg_admin_operator';
-    let users = [], rewards = [], redeems = [], rankings = [], selected = null, selectedStatus = '', saving = false, lastQr = null, pointUser = null, bulkPreviewData = null;
+    let users = [], rewards = [], redeems = [], rankings = [], courses = [], coursesLoaded = false, editingCourseId = '', selected = null, selectedStatus = '', saving = false, lastQr = null, pointUser = null, bulkPreviewData = null;
     const statusMap = {
       PENDING: { label:'รอตรวจสอบ', cls:'pending' }, APPROVED:{ label:'อนุมัติแล้ว', cls:'approved' },
       DELIVERED:{ label:'ส่งมอบแล้ว', cls:'delivered' }, REJECTED:{ label:'ยกเลิก', cls:'rejected' }
@@ -344,8 +366,9 @@
     document.querySelectorAll('.admin-nav button[data-view]').forEach(button=>button.addEventListener('click',()=>{
       document.querySelectorAll('.admin-nav button').forEach(x=>x.classList.remove('active')); button.classList.add('active');
       document.querySelectorAll('.view').forEach(x=>x.classList.remove('active')); document.getElementById(button.dataset.view+'View').classList.add('active');
-      const pageNames={dashboard:'Dashboard',redeem:'Redeem Management',qr:'QR Point Generator',points:'Point Management',ranking:'Ranking Management'};
+      const pageNames={dashboard:'Dashboard',redeem:'Redeem Management',qr:'QR Point Generator',points:'Point Management',ranking:'Ranking Management',courses:'Courses & Calendar'};
       document.getElementById('pageName').textContent=pageNames[button.dataset.view]||'Admin Control';
+      if(button.dataset.view==='courses'&&!coursesLoaded) loadCourses();
     }));
     async function createQr(event){
       event.preventDefault();
@@ -466,6 +489,39 @@
         const available=document.createElement('td');available.textContent=n(item.availablePoint).toLocaleString('th-TH');tr.appendChild(available);body.appendChild(tr);
       });
     }
+    function courseDateValue(value){ const d=new Date(value); if(!Number.isNaN(d.getTime()))return d.toISOString().slice(0,10); return String(value||'').slice(0,10); }
+    async function loadCourses(){
+      document.getElementById('courseRows').innerHTML='<tr><td colspan="6" class="empty">กำลังโหลด...</td></tr>';
+      const result=await api('adminGetCourseManagement');
+      if(!result.success){ showToast(result.message||'โหลดหลักสูตรไม่สำเร็จ','error'); return; }
+      courses=Array.isArray(result.courses)?result.courses:[]; coursesLoaded=true; renderCourses();
+    }
+    function renderCourses(){
+      const body=document.getElementById('courseRows'); body.replaceChildren();
+      if(!courses.length){ const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=6;td.className='empty';td.textContent='ยังไม่มีหลักสูตร';tr.appendChild(td);body.appendChild(tr);return; }
+      courses.forEach(item=>{ const tr=document.createElement('tr');
+        const name=document.createElement('td');name.className='primary-cell';name.textContent=`${item.CourseID||'—'}\n${item.CourseName||'—'}`;name.style.whiteSpace='pre-line';tr.appendChild(name);
+        [ `${courseDateValue(item.Date)||'—'}\n${item.Time||'—'}`, item.Location||'—', item.Format||'—', item.JourneyNo||'—' ].forEach((value,index)=>{const td=document.createElement('td');td.textContent=value;if(index===0)td.style.whiteSpace='pre-line';tr.appendChild(td);});
+        const actions=document.createElement('td'),group=document.createElement('div');group.className='course-actions';group.append(actionButton('แก้ไข','primary',()=>editCourse(item)),actionButton('ลบ','',()=>deleteCourse(item)));actions.appendChild(group);tr.appendChild(actions);body.appendChild(tr);
+      });
+    }
+    function editCourse(item){
+      editingCourseId=String(item.CourseID); document.getElementById('courseFormTitle').textContent='แก้ไขหลักสูตร'; document.getElementById('courseId').value=item.CourseID||''; document.getElementById('courseId').readOnly=true;
+      document.getElementById('courseName').value=item.CourseName||''; document.getElementById('courseDate').value=courseDateValue(item.Date); document.getElementById('courseTime').value=String(item.Time||'').slice(0,5);
+      document.getElementById('courseLocation').value=item.Location||''; document.getElementById('courseFormat').value=item.Format||'Classroom'; document.getElementById('courseJourney').value=item.JourneyNo||''; document.getElementById('courseCancelBtn').hidden=false; window.scrollTo({top:0,behavior:'smooth'});
+    }
+    function resetCourseForm(){ editingCourseId='';document.getElementById('courseForm').reset();document.getElementById('courseId').readOnly=false;document.getElementById('courseFormTitle').textContent='เพิ่มหลักสูตร';document.getElementById('courseCancelBtn').hidden=true; }
+    async function saveCourse(event){
+      event.preventDefault(); const adminName=adminNameInput.value.trim();if(!adminName){adminNameInput.focus();showToast('กรุณาระบุชื่อผู้ดำเนินการ','error');return;}
+      const course={courseId:document.getElementById('courseId').value.trim().toUpperCase(),courseName:document.getElementById('courseName').value.trim(),date:document.getElementById('courseDate').value,time:document.getElementById('courseTime').value,location:document.getElementById('courseLocation').value.trim(),format:document.getElementById('courseFormat').value,journeyNo:document.getElementById('courseJourney').value,adminName};
+      const btn=document.getElementById('courseSaveBtn');btn.disabled=true;btn.textContent='กำลังบันทึก...';const result=await api('adminSaveCourse',course);btn.disabled=false;btn.textContent='บันทึกหลักสูตร';
+      if(!result.success){showToast(result.message||'บันทึกไม่สำเร็จ','error');return;}showToast(editingCourseId?'แก้ไขหลักสูตรแล้ว':'เพิ่มหลักสูตรแล้ว','success');resetCourseForm();await loadCourses();
+    }
+    async function deleteCourse(item){
+      if(!adminNameInput.value.trim()){adminNameInput.focus();showToast('กรุณาระบุชื่อผู้ดำเนินการ','error');return;}
+      if(!confirm(`ยืนยันลบ ${item.CourseID} ${item.CourseName}?\nข้อมูล Questions และ TestResults จะไม่ถูกลบ`))return;
+      const result=await api('adminDeleteCourseManaged',{courseId:item.CourseID,adminName:adminNameInput.value.trim()});if(!result.success){showToast(result.message||'ลบไม่สำเร็จ','error');return;}showToast('ลบหลักสูตรแล้ว','success');if(editingCourseId===item.CourseID)resetCourseForm();await loadCourses();
+    }
     document.getElementById('searchInput').addEventListener('input',renderRedeems);
     document.getElementById('statusFilter').addEventListener('change',renderRedeems);
     document.getElementById('refreshBtn').addEventListener('click',loadAll);
@@ -484,6 +540,9 @@
     document.getElementById('rankingSearch').addEventListener('input',renderRanking);
     document.getElementById('rankingBrand').addEventListener('change',renderRanking);
     document.getElementById('rankingRefresh').addEventListener('click',loadAll);
+    document.getElementById('courseForm').addEventListener('submit',saveCourse);
+    document.getElementById('courseCancelBtn').addEventListener('click',resetCourseForm);
+    document.getElementById('courseRefresh').addEventListener('click',loadCourses);
     document.getElementById('actionModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
     loadAll();
   </script>
