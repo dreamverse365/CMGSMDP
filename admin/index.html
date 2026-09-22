@@ -86,6 +86,29 @@
     .action-btn { min-height: 36px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border); background: #fff; color: var(--text-2); cursor: pointer; white-space: nowrap; }
     .action-btn.primary { color: #fff; background: var(--brand); border-color: var(--brand); }
     .action-btn.success { color: #fff; background: var(--success); border-color: var(--success); }
+    .qr-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.82fr); gap:18px; align-items:start; }
+    .panel { padding:22px; border:1px solid var(--border); border-radius:16px; background:#fff; box-shadow:0 7px 24px rgba(25,25,25,.045); }
+    .panel h2 { color:var(--text); font:800 16px/1.3 'Manrope','Noto Sans Thai'; }
+    .panel-copy { margin-top:6px; color:var(--text-3); font-size:11px; line-height:1.6; }
+    .form-field { margin-top:18px; }
+    .form-field label { display:block; margin-bottom:7px; color:var(--text-2); font-size:11px; font-weight:700; }
+    .form-field input { width:100%; min-height:46px; padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:var(--surface-2); color:var(--text); }
+    .hint { display:block; margin-top:6px; color:var(--text-3); font-size:9px; }
+    .generate-btn { width:100%; min-height:46px; margin-top:20px; border:1px solid var(--brand); border-radius:10px; background:var(--brand); color:#fff; font-weight:700; cursor:pointer; transition:background .2s,opacity .2s; }
+    .generate-btn:hover { background:var(--brand-hover); }
+    .generate-btn:disabled { opacity:.55; cursor:wait; }
+    .qr-placeholder { min-height:350px; display:grid; place-items:center; text-align:center; color:var(--text-3); }
+    .qr-placeholder svg { width:56px; height:56px; margin-bottom:12px; color:var(--surface-3); }
+    .qr-result[hidden] { display:none; }
+    .qr-code { width:236px; min-height:236px; display:grid; place-items:center; margin:18px auto; padding:8px; border:1px solid var(--border); border-radius:14px; background:#fff; }
+    .qr-code img, .qr-code canvas { max-width:100%; height:auto !important; }
+    .qr-meta { display:grid; gap:8px; padding:12px; border-radius:10px; background:var(--surface-2); font-size:10px; color:var(--text-2); }
+    .qr-meta strong { color:var(--text); }
+    .url-row { display:flex; gap:8px; margin-top:12px; }
+    .url-row input { min-width:0; flex:1; min-height:40px; padding:8px 10px; border:1px solid var(--border); border-radius:9px; background:#fff; color:var(--text-2); font-size:10px; }
+    .qr-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+    .qr-actions button { min-height:42px; border:1px solid var(--border); border-radius:9px; background:#fff; color:var(--text-2); cursor:pointer; }
+    .qr-actions .primary { border-color:var(--brand); background:var(--brand); color:#fff; }
     .empty { padding: 48px 20px; color: var(--text-3); text-align: center; }
     .modal { display:none; position:fixed; inset:0; z-index:300; align-items:center; justify-content:center; padding:20px; background:rgba(0,0,0,.55); backdrop-filter:blur(5px); }
     .modal.visible { display:flex; }
@@ -113,6 +136,7 @@
       .content { padding:20px 16px; }
       .stat-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .module-grid { grid-template-columns:1fr 1fr; }
+      .qr-grid { grid-template-columns:1fr; }
     }
     @media(max-width:540px) {
       .operator label { display:none; }
@@ -128,7 +152,7 @@
       <nav class="admin-nav" aria-label="เมนูผู้ดูแล">
         <button class="active" data-view="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</button>
         <button data-view="redeem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7M22 7H2v5h20V7zM12 22V7"/></svg>Redeem</button>
-        <button disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><path d="M14 14h3v3h3v3h-6z"/></svg>QR Point <span class="coming">NEXT</span></button>
+        <button data-view="qr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><path d="M14 14h3v3h3v3h-6z"/></svg>QR Point</button>
         <button disabled>Point Management <span class="coming">NEXT</span></button>
         <button disabled>Ranking <span class="coming">NEXT</span></button>
         <button disabled>Courses & Tests <span class="coming">NEXT</span></button>
@@ -150,7 +174,7 @@
           </div>
           <div class="module-grid">
             <div class="module-card"><h2>Redeem Management</h2><p>อนุมัติ ส่งมอบ หรือยกเลิกพร้อมคืนคะแนนและ Stock</p><span class="module-status ready">พร้อมใช้งาน</span></div>
-            <div class="module-card"><h2>QR Point Generator</h2><p>สร้าง QR รับคะแนน กำหนดอายุและเหตุผลการให้คะแนน</p><span class="module-status">ขั้นตอนถัดไป</span></div>
+            <div class="module-card"><h2>QR Point Generator</h2><p>สร้าง QR รับคะแนน กำหนดอายุและเหตุผลการให้คะแนน</p><span class="module-status ready">พร้อมใช้งาน</span></div>
             <div class="module-card"><h2>Point Management</h2><p>ค้นหาพนักงาน เพิ่ม ลด และตรวจสอบประวัติคะแนน</p><span class="module-status">ขั้นตอนถัดไป</span></div>
             <div class="module-card"><h2>Course & Test</h2><p>จัดการหลักสูตร แบบทดสอบ และตรวจสอบผลการทำข้อสอบ</p><span class="module-status">รอพัฒนา</span></div>
             <div class="module-card"><h2>Rewards & Stock</h2><p>จัดการของรางวัล คะแนนที่ใช้ และจำนวนคงเหลือ</p><span class="module-status">รอพัฒนา</span></div>
@@ -163,6 +187,28 @@
           <div class="toolbar"><input id="searchInput" type="search" placeholder="ค้นหา Employee ID, ชื่อ หรือเลขอ้างอิง"><select id="statusFilter"><option value="ALL">ทุกสถานะ</option><option value="PENDING">รอตรวจสอบ</option><option value="APPROVED">อนุมัติแล้ว</option><option value="DELIVERED">ส่งมอบแล้ว</option><option value="REJECTED">ยกเลิก</option></select><button class="refresh-btn" id="refreshBtn">รีเฟรช</button></div>
           <div class="table-wrap"><table><thead><tr><th>REFERENCE</th><th>EMPLOYEE</th><th>REWARD</th><th>POINT</th><th>DATE</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody id="redeemRows"><tr><td colspan="7" class="empty">กำลังโหลด...</td></tr></tbody></table></div>
         </section>
+
+        <section class="view" id="qrView">
+          <div class="intro"><div class="eyebrow">POINT OPERATIONS</div><h1>QR Point Generator</h1><p>สร้าง QR สำหรับให้พนักงานสแกนรับคะแนน ลิงก์จะหมดอายุภายใน 1 ชั่วโมง</p></div>
+          <div class="qr-grid">
+            <form class="panel" id="qrForm">
+              <h2>รายละเอียดการให้คะแนน</h2><p class="panel-copy">กรอกคะแนนและเหตุผลให้ชัดเจนก่อนสร้าง QR</p>
+              <div class="form-field"><label for="qrPoint">จำนวน Point</label><input id="qrPoint" name="point" type="number" min="1" max="300" step="1" inputmode="numeric" placeholder="เช่น 5" required><small class="hint">จำนวนเต็ม 1–300 Point</small></div>
+              <div class="form-field"><label for="qrReason">เหตุผล / กิจกรรม</label><input id="qrReason" name="reason" maxlength="120" placeholder="เช่น เข้าร่วม Workshop CMG01" required></div>
+              <button class="generate-btn" id="generateQrBtn" type="submit">สร้าง QR Code</button>
+            </form>
+            <div class="panel">
+              <div class="qr-placeholder" id="qrPlaceholder"><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h4v4h-7z"/></svg><p>QR Code จะแสดงที่นี่<br>หลังจากกดสร้าง</p></div></div>
+              <div class="qr-result" id="qrResult" hidden>
+                <h2>พร้อมให้สแกน</h2><p class="panel-copy">ผู้ใช้ต้อง Login และกดยืนยันรับ Point ภายในเวลาที่กำหนด</p>
+                <div class="qr-code" id="qrCode"></div>
+                <div class="qr-meta"><div>รหัส: <strong id="qrId">—</strong></div><div>คะแนน: <strong id="qrPointResult">—</strong></div><div>หมดอายุ: <strong id="qrExpiry">—</strong></div></div>
+                <div class="url-row"><input id="qrUrl" readonly aria-label="ลิงก์รับคะแนน"><button class="action-btn" id="copyQrBtn" type="button">คัดลอก</button></div>
+                <div class="qr-actions"><button id="newQrBtn" type="button">สร้างรายการใหม่</button><button class="primary" id="downloadQrBtn" type="button">ดาวน์โหลด PNG</button></div>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -171,10 +217,11 @@
     <div class="modal-card"><h2 id="modalTitle">ยืนยันรายการ</h2><p id="modalCopy"></p><div class="modal-summary" id="modalSummary"></div><div class="field"><label for="adminNote">หมายเหตุสำหรับ User</label><textarea id="adminNote" placeholder="เช่น กรุณาติดต่อ HR เพื่อรับรางวัล"></textarea></div><div class="modal-actions"><button class="cancel" id="cancelBtn">ยกเลิก</button><button class="confirm" id="confirmBtn">ยืนยัน</button></div></div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="../js/config.js"></script>
   <script>
     const ADMIN_NAME_KEY = 'cmg_admin_operator';
-    let users = [], rewards = [], redeems = [], selected = null, selectedStatus = '', saving = false;
+    let users = [], rewards = [], redeems = [], selected = null, selectedStatus = '', saving = false, lastQr = null;
     const statusMap = {
       PENDING: { label:'รอตรวจสอบ', cls:'pending' }, APPROVED:{ label:'อนุมัติแล้ว', cls:'approved' },
       DELIVERED:{ label:'ส่งมอบแล้ว', cls:'delivered' }, REJECTED:{ label:'ยกเลิก', cls:'rejected' }
@@ -217,7 +264,6 @@
         const st=statusOf(item.Status); const row=document.createElement('tr');
         const values=[item.RedeemID||'—',`${item.EmpID||'—'}\n${item.Firstname||''} ${item.Lastname||''}`,item.RewardName||'—',n(item.PointUsed).toLocaleString('th-TH'),dateTime(item.Date)];
         values.forEach((value,index)=>{ const td=document.createElement('td'); td.textContent=value; if(index===0)td.className='primary-cell'; td.style.whiteSpace=index===1?'pre-line':''; row.appendChild(td); });
-        const statusTd=document.createElement('td'); const badge=document.createElement('span'); badge.className=`status ${st.cls}`; badge.textContent=st.label; statusTd.appendChild(badge); row.appendChild(statusTd);
         const actionTd=document.createElement('td'); const group=document.createElement('div'); group.className='action-group';
         if(st.key==='PENDING'){ group.append(actionButton('อนุมัติ','primary',()=>openAction(item,'APPROVED')),actionButton('ยกเลิก','',()=>openAction(item,'REJECTED'))); }
         if(st.key==='APPROVED'){ group.append(actionButton('ส่งมอบแล้ว','success',()=>openAction(item,'DELIVERED')),actionButton('ยกเลิก','',()=>openAction(item,'REJECTED'))); }
@@ -245,13 +291,57 @@
     document.querySelectorAll('.admin-nav button[data-view]').forEach(button=>button.addEventListener('click',()=>{
       document.querySelectorAll('.admin-nav button').forEach(x=>x.classList.remove('active')); button.classList.add('active');
       document.querySelectorAll('.view').forEach(x=>x.classList.remove('active')); document.getElementById(button.dataset.view+'View').classList.add('active');
-      document.getElementById('pageName').textContent=button.dataset.view==='dashboard'?'Dashboard':'Redeem Management';
+      const pageNames={dashboard:'Dashboard',redeem:'Redeem Management',qr:'QR Point Generator'};
+      document.getElementById('pageName').textContent=pageNames[button.dataset.view]||'Admin Control';
     }));
+    async function createQr(event){
+      event.preventDefault();
+      const adminName=adminNameInput.value.trim();
+      if(!adminName){ adminNameInput.focus(); showToast('กรุณาระบุชื่อผู้ดำเนินการ','error'); return; }
+      const point=Number(document.getElementById('qrPoint').value);
+      const reason=document.getElementById('qrReason').value.trim();
+      if(!Number.isInteger(point)||point<1||point>300){ showToast('Point ต้องเป็นจำนวนเต็ม 1–300','error'); return; }
+      if(!reason){ document.getElementById('qrReason').focus(); showToast('กรุณาระบุเหตุผล','error'); return; }
+      const btn=document.getElementById('generateQrBtn'); btn.disabled=true; btn.textContent='กำลังสร้าง...';
+      const result=await api('adminGenerateQR',{point,reason,adminName});
+      btn.disabled=false; btn.textContent='สร้าง QR Code';
+      if(!result.success){ showToast(result.message||'สร้าง QR Code ไม่สำเร็จ','error'); return; }
+      lastQr=result;
+      document.getElementById('qrPlaceholder').hidden=true;
+      document.getElementById('qrResult').hidden=false;
+      document.getElementById('qrId').textContent=result.qrCodeId;
+      document.getElementById('qrPointResult').textContent=`${n(result.point).toLocaleString('th-TH')} Point · ${result.reason}`;
+      document.getElementById('qrExpiry').textContent=dateTime(result.expiresAt);
+      document.getElementById('qrUrl').value=result.scanUrl;
+      const box=document.getElementById('qrCode'); box.replaceChildren();
+      new QRCode(box,{text:result.scanUrl,width:220,height:220,colorDark:'#171717',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+      showToast('สร้าง QR Code สำเร็จ','success');
+    }
+    async function copyQr(){
+      if(!lastQr)return;
+      try{ await navigator.clipboard.writeText(lastQr.scanUrl); showToast('คัดลอกลิงก์แล้ว','success'); }
+      catch(_){ const input=document.getElementById('qrUrl'); input.select(); document.execCommand('copy'); showToast('คัดลอกลิงก์แล้ว','success'); }
+    }
+    function downloadQr(){
+      if(!lastQr)return;
+      const canvas=document.querySelector('#qrCode canvas'); const image=document.querySelector('#qrCode img');
+      const url=canvas?canvas.toDataURL('image/png'):(image?image.src:'');
+      if(!url){ showToast('ยังไม่พบภาพ QR','error'); return; }
+      const link=document.createElement('a'); link.href=url; link.download=`CMG-${lastQr.qrCodeId}.png`; link.click();
+    }
+    function resetQr(){
+      lastQr=null; document.getElementById('qrForm').reset(); document.getElementById('qrCode').replaceChildren();
+      document.getElementById('qrResult').hidden=true; document.getElementById('qrPlaceholder').hidden=false; document.getElementById('qrPoint').focus();
+    }
     document.getElementById('searchInput').addEventListener('input',renderRedeems);
     document.getElementById('statusFilter').addEventListener('change',renderRedeems);
     document.getElementById('refreshBtn').addEventListener('click',loadAll);
     document.getElementById('cancelBtn').addEventListener('click',closeModal);
     document.getElementById('confirmBtn').addEventListener('click',saveAction);
+    document.getElementById('qrForm').addEventListener('submit',createQr);
+    document.getElementById('copyQrBtn').addEventListener('click',copyQr);
+    document.getElementById('downloadQrBtn').addEventListener('click',downloadQr);
+    document.getElementById('newQrBtn').addEventListener('click',resetQr);
     document.getElementById('actionModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
     loadAll();
   </script>
