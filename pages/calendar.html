@@ -388,7 +388,7 @@
       info.className = 'course-info';
       const labels = document.createElement('div');
       labels.className = 'course-labels';
-      if (course.JourneyNo) labels.appendChild(textElement('span', 'course-pill course-pill--journey', `JOURNEY ${course.JourneyNo}`));
+      if (course.JourneyNo) labels.appendChild(textElement('span', 'course-pill course-pill--journey', `MODULE ${course.JourneyNo}`));
       labels.appendChild(textElement('span', `course-pill course-pill--${online ? 'online' : 'classroom'}`, online ? 'ONLINE' : 'CLASSROOM'));
       if (past) labels.appendChild(textElement('span', 'course-pill course-pill--past', 'COMPLETED'));
       info.append(labels, textElement('h2', 'course-name', course.CourseName || 'ไม่ระบุชื่อหลักสูตร'));
