@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Knowledge — CMG SMDP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/app.css">
+  <style>
+    body{font-family:'Inter','Prompt',sans-serif;background:var(--bg)}
+    button,input,select{font:inherit}
+    .knowledge-search{display:grid;grid-template-columns:1fr 130px;gap:9px;margin-bottom:18px}
+    .knowledge-search input,.knowledge-search select{min-height:44px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text)}
+    .knowledge-grid{display:grid;gap:12px}
+    .knowledge-card{display:grid;grid-template-columns:48px 1fr 28px;gap:13px;align-items:center;padding:16px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface);text-decoration:none;box-shadow:0 7px 22px rgba(25,25,25,.04);transition:border-color .2s,transform .15s}
+    .knowledge-card:hover{border-color:var(--border-hover)}.knowledge-card:active{transform:scale(.99)}
+    .file-icon{width:48px;height:48px;display:grid;place-items:center;border-radius:12px;background:var(--brand-dim);color:var(--brand)}.file-icon svg{width:23px;height:23px}
+    .knowledge-title{color:var(--text);font:600 14px/1.45 'Prompt',sans-serif}.knowledge-desc{margin-top:3px;color:var(--text-3);font-size:11px;line-height:1.55}
+    .knowledge-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.knowledge-tag{padding:3px 8px;border-radius:99px;background:var(--surface-2);color:var(--text-2);font-size:9px;font-weight:600}
+    .open-icon{color:var(--text-3)}.open-icon svg{width:18px;height:18px}
+    @media(max-width:380px){.knowledge-search{grid-template-columns:1fr}.knowledge-card{grid-template-columns:42px 1fr 22px}.file-icon{width:42px;height:42px}}
+  </style>
+</head>
+<body>
+  <header class="page-header"><button class="page-header__back" onclick="history.back()" aria-label="ย้อนกลับ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m15 18-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>กลับ</button><div class="page-header__title">KNOWLEDGE</div><div style="width:42px"></div></header>
+  <main class="page-body">
+    <p class="section-label">คลังความรู้</p>
+    <div class="knowledge-search"><input id="searchInput" type="search" placeholder="ค้นหาชื่อหรือรายละเอียด"><select id="categoryFilter"><option value="ALL">ทุกหมวดหมู่</option></select></div>
+    <div class="knowledge-grid" id="knowledgeList"><div class="empty-state"><div class="skeleton" style="width:100%;height:80px"></div></div></div>
+  </main>
+  <nav class="bottom-nav">
+    <a class="nav-item" href="home.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12 12 3l9 9M9 21v-9h6v9"/></svg><span class="nav-item__label">หน้าหลัก</span></a>
+    <a class="nav-item" href="calendar.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg><span class="nav-item__label">ตาราง</span></a>
+    <a class="nav-item" href="ranking.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span class="nav-item__label">Ranking</span></a>
+    <a class="nav-item" href="redeem.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 12v7H4v-7M2 7h20v5H2zM12 22V7"/></svg><span class="nav-item__label">Redeem</span></a>
+  </nav>
+  <script src="../js/config.js"></script>
+  <script>
+    const session=Session.get();if(!session)location.href='../index.html';let knowledge=[];
+    function safeUrl(value){try{const url=new URL(value);return ['https:','http:'].includes(url.protocol)?url.href:''}catch(_){return ''}}
+    function fillCategories(){const select=document.getElementById('categoryFilter');[...new Set(knowledge.map(x=>String(x.Category||'').trim()).filter(Boolean))].sort().forEach(x=>select.add(new Option(x,x)))}
+    function render(){const q=document.getElementById('searchInput').value.trim().toLowerCase(),category=document.getElementById('categoryFilter').value;const list=knowledge.filter(x=>(category==='ALL'||String(x.Category)===category)&&(!q||[x.Title,x.Description,x.Category].join(' ').toLowerCase().includes(q)));const box=document.getElementById('knowledgeList');box.replaceChildren();if(!list.length){box.innerHTML='<div class="empty-state"><p>ไม่พบรายการความรู้</p></div>';return;}list.forEach(item=>{const url=safeUrl(item.FileURL);const card=document.createElement(url?'a':'div');card.className='knowledge-card';if(url){card.href=url;card.target='_blank';card.rel='noopener noreferrer';}card.innerHTML=`<div class="file-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2h8l4 4v16H6z" stroke-linejoin="round"/><path d="M14 2v5h5M9 12h6M9 16h6" stroke-linecap="round"/></svg></div><div><div class="knowledge-title"></div><div class="knowledge-desc"></div><div class="knowledge-meta"><span class="knowledge-tag"></span><span class="knowledge-tag"></span></div></div><div class="open-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 5h5v5M19 5l-8 8M18 13v6H5V6h6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;card.querySelector('.knowledge-title').textContent=item.Title||'Untitled';card.querySelector('.knowledge-desc').textContent=item.Description||'';const tags=card.querySelectorAll('.knowledge-tag');tags[0].textContent=item.Category||'General';tags[1].textContent=item.FileType||'File';box.appendChild(card);});}
+    async function loadKnowledge(){const result=await api('getKnowledge',{empId:session.empId});if(!result.success){const box=document.getElementById('knowledgeList');box.replaceChildren();const empty=document.createElement('div');empty.className='empty-state';const message=document.createElement('p');message.textContent=result.message||'โหลดข้อมูลไม่สำเร็จ';empty.appendChild(message);box.appendChild(empty);return;}knowledge=Array.isArray(result.knowledge)?result.knowledge:[];fillCategories();render()}
+    document.getElementById('searchInput').addEventListener('input',render);document.getElementById('categoryFilter').addEventListener('change',render);if(session)loadKnowledge();
+  </script>
+</body>
+</html>
