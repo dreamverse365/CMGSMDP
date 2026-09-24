@@ -114,18 +114,27 @@
       border-top: 1px solid var(--border);
     }
 
+    /* ── Question header: number + labels stacked ── */
+    .question-header {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
     .question-number {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
       width: 25px;
       height: 25px;
-      margin-bottom: 10px;
       border-radius: 50%;
       color: var(--brand);
       background: var(--brand-dim);
       font: 700 11px/1 'Manrope', sans-serif;
     }
+
+    .question-labels { flex: 1; min-width: 0; }
 
     .question-label {
       display: block;
@@ -139,20 +148,17 @@
       display: block;
       color: var(--text-3);
       font: 400 11px/1.55 'Manrope', sans-serif;
-      margin-top: 5px;
+      margin-top: 4px;
     }
 
+    /* ── Rating: single row (≤ 5 options) ── */
     .rating-options {
       display: flex;
       gap: 8px;
-      margin: 16px -2px 0;
-      padding: 2px 2px 8px;
-      overflow-x: auto;
-      overscroll-behavior-inline: contain;
-      scrollbar-width: thin;
+      margin-top: 16px;
     }
 
-    .rating-choice { flex: 1 0 44px; min-width: 44px; }
+    .rating-choice { flex: 1 0 44px; }
     .rating-choice input {
       position: absolute;
       width: 1px;
@@ -189,6 +195,18 @@
 
     .rating-choice span:active { transform: scale(.96); }
 
+    /* ── Rating: two-row grid (> 5 options) ── */
+    .rating-options--grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .rating-options--grid .rating-choice {
+      flex: unset;
+    }
+
     .scale-labels {
       display: flex;
       justify-content: space-between;
@@ -196,7 +214,7 @@
       color: var(--text-3);
       font-size: 10px;
       line-height: 1.45;
-      margin-top: 3px;
+      margin-top: 8px;
     }
 
     .scale-labels span:last-child { text-align: right; }
@@ -445,19 +463,36 @@
       fieldset.className = 'question-block';
       fieldset.dataset.questionId = question.QuestionID;
 
-      fieldset.appendChild(textElement('span', 'question-number', String(questionIndex + 1)));
+      // ── Question header: number + labels side by side ──
+      const header = document.createElement('div');
+      header.className = 'question-header';
+
+      const numBadge = textElement('span', 'question-number', String(questionIndex + 1));
+      header.appendChild(numBadge);
+
+      const labelsWrap = document.createElement('div');
+      labelsWrap.className = 'question-labels';
+
       const legend = textElement('legend', 'question-label', question.QuestionTH);
       if (question.Required) legend.appendChild(textElement('span', 'required-mark', ' *'));
-      fieldset.appendChild(legend);
-      if (question.QuestionEN) fieldset.appendChild(textElement('span', 'question-label-en', question.QuestionEN));
+      labelsWrap.appendChild(legend);
+      if (question.QuestionEN) labelsWrap.appendChild(textElement('span', 'question-label-en', question.QuestionEN));
 
+      header.appendChild(labelsWrap);
+      fieldset.appendChild(header);
+
+      // ── Rating options ──
+      const min = Number(question.MinScore);
+      const max = Number(question.MaxScore);
+      const count = max - min + 1;
+
+      // > 5 options → 2-row grid (5 per row); ≤ 5 → single flex row
+      const useGrid = count > 5;
       const options = document.createElement('div');
-      options.className = 'rating-options';
+      options.className = useGrid ? 'rating-options--grid' : 'rating-options';
       options.setAttribute('role', 'radiogroup');
       options.setAttribute('aria-label', question.QuestionTH);
 
-      const min = Number(question.MinScore);
-      const max = Number(question.MaxScore);
       for (let score = min; score <= max; score++) {
         const label = document.createElement('label');
         label.className = 'rating-choice';
@@ -491,12 +526,24 @@
       block.className = 'question-block';
       block.dataset.questionId = question.QuestionID;
 
-      block.appendChild(textElement('span', 'question-number', String(questionIndex + 1)));
-      const label = textElement('label', 'question-label', question.QuestionTH);
-      label.htmlFor = `answer-${question.QuestionID}`;
-      if (question.Required) label.appendChild(textElement('span', 'required-mark', ' *'));
-      block.appendChild(label);
-      if (question.QuestionEN) block.appendChild(textElement('span', 'question-label-en', question.QuestionEN));
+      // ── Question header: number + labels side by side ──
+      const header = document.createElement('div');
+      header.className = 'question-header';
+
+      const numBadge = textElement('span', 'question-number', String(questionIndex + 1));
+      header.appendChild(numBadge);
+
+      const labelsWrap = document.createElement('div');
+      labelsWrap.className = 'question-labels';
+
+      const labelEl = textElement('label', 'question-label', question.QuestionTH);
+      labelEl.htmlFor = `answer-${question.QuestionID}`;
+      if (question.Required) labelEl.appendChild(textElement('span', 'required-mark', ' *'));
+      labelsWrap.appendChild(labelEl);
+      if (question.QuestionEN) labelsWrap.appendChild(textElement('span', 'question-label-en', question.QuestionEN));
+
+      header.appendChild(labelsWrap);
+      block.appendChild(header);
 
       const textarea = document.createElement('textarea');
       textarea.className = 'text-answer';
