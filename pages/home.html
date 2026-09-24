@@ -982,10 +982,19 @@ function closeHistory(e) {
 }
 
 function logout() {
-  if (confirm('ออกจากระบบ?')) {
-    Session.clear();
-    window.location.href = '../index.html';
-  }
+  document.getElementById('logoutModal').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLogoutModal(e) {
+  if (e && e.target !== document.getElementById('logoutModal')) return;
+  document.getElementById('logoutModal').classList.remove('visible');
+  document.body.style.overflow = '';
+}
+
+function confirmLogout() {
+  Session.clear();
+  window.location.href = '../index.html';
 }
 
 refreshProfile();
