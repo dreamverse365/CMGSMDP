@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>CMG SMDP — Course Evaluation</title>
+  <title>CMG Store Manager Development Program — Course Evaluation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/app.css">
@@ -143,16 +143,28 @@
     }
 
     .rating-options {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 8px;
-      margin: 16px -2px 0;
-      padding: 2px 2px 8px;
-      overflow-x: auto;
-      overscroll-behavior-inline: contain;
-      scrollbar-width: thin;
+      margin: 16px 0 0;
+      padding: 2px 0 8px;
+      overflow: visible;
     }
 
-    .rating-choice { flex: 1 0 44px; min-width: 44px; }
+    /* คะแนน 0–10 แบ่งเป็น 2 แถว: 0–5 และ 6–10 โดยไม่ต้องเลื่อนแนวนอน */
+    .rating-options--eleven {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .rating-options--eleven .rating-choice:nth-child(n + 7) {
+      grid-column: span 1;
+    }
+
+    .rating-options--eleven .rating-choice:nth-child(7) {
+      grid-column-start: 1;
+    }
+
+    .rating-choice { min-width: 0; }
     .rating-choice input {
       position: absolute;
       width: 1px;
@@ -351,6 +363,8 @@
       .page-body { padding-inline: 16px; }
       .question-block { padding-inline: 16px; }
       .section-heading { padding-inline: 16px; }
+      .rating-options { gap: 6px; }
+      .rating-choice span { min-height: 44px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -397,7 +411,7 @@
       </div>
       <h2 id="resultTitle">ส่งแบบประเมินเรียบร้อย</h2>
       <p>ขอบคุณสำหรับความคิดเห็น ระบบบันทึกข้อมูลของคุณแล้ว</p>
-      <button class="btn btn--full" type="button" style="margin-top:20px;background:var(--brand);color:#fff;" onclick="location.href='calendar.html'">กลับหน้า Calendar</button>
+      <button class="btn btn--full" type="button" style="margin-top:20px;background:var(--brand);color:#fff;" onclick="returnToCalendar()">กลับหน้า Calendar</button>
     </div>
   </div>
 
@@ -458,6 +472,7 @@
 
       const min = Number(question.MinScore);
       const max = Number(question.MaxScore);
+      if (max - min + 1 === 11) options.classList.add('rating-options--eleven');
       for (let score = min; score <= max; score++) {
         const label = document.createElement('label');
         label.className = 'rating-choice';
@@ -638,8 +653,16 @@
       }
 
       dirty = false;
+      sessionStorage.setItem(`evaluationCompleted:${session.empId}:${courseId}`, 'true');
       document.getElementById('resultOverlay').classList.add('visible');
       document.querySelector('#resultOverlay button').focus();
+    }
+
+    function returnToCalendar() {
+      const target = new URL('calendar.html', window.location.href);
+      target.searchParams.set('evaluationCompleted', courseId);
+      target.searchParams.set('updated', Date.now().toString());
+      window.location.replace(target.href);
     }
 
     async function loadEvaluation() {
