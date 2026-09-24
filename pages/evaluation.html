@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>CMG SMDP — Course Evaluation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/app.css">
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      background: var(--bg);
+      padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -20%;
+      left: -10%;
+      width: 65vw;
+      height: 65vw;
+      background: radial-gradient(circle, rgba(186,43,43,.055) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page-body { position: relative; z-index: 1; }
+    .page-header__back { min-width: 44px; min-height: 44px; }
+
+    .evaluation-intro {
+      margin: 4px 0 22px;
+    }
+
+    .evaluation-eyebrow {
+      color: var(--brand);
+      font: 700 10px/1 'Manrope', sans-serif;
+      letter-spacing: .16em;
+      margin-bottom: 9px;
+    }
+
+    .evaluation-title {
+      color: var(--text);
+      font: 800 clamp(25px, 7vw, 34px)/1.2 'Manrope', 'Prompt', sans-serif;
+      letter-spacing: -.025em;
+      margin-bottom: 8px;
+    }
+
+    .evaluation-course {
+      color: var(--brand);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    .evaluation-copy {
+      color: var(--text-2);
+      font-size: 13px;
+      line-height: 1.65;
+      margin-top: 8px;
+    }
+
+    .required-note {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 14px;
+      color: var(--text-3);
+      font-size: 11px;
+    }
+
+    .required-mark { color: var(--brand); font-weight: 700; }
+
+    .evaluation-form { display: grid; gap: 18px; }
+
+    .evaluation-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 8px 26px rgba(25,25,25,.055);
+      overflow: hidden;
+    }
+
+    .section-heading {
+      padding: 17px 18px 15px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(186,43,43,.07), rgba(186,43,43,.025));
+    }
+
+    .section-heading h2 {
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .section-heading p {
+      color: var(--text-3);
+      font: 600 9px/1.3 'Manrope', sans-serif;
+      letter-spacing: .08em;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    .question-block {
+      margin: 0;
+      padding: 20px 18px;
+      border: 0;
+      min-width: 0;
+    }
+
+    .question-block + .question-block {
+      border-top: 1px solid var(--border);
+    }
+
+    .question-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 25px;
+      height: 25px;
+      margin-bottom: 10px;
+      border-radius: 50%;
+      color: var(--brand);
+      background: var(--brand-dim);
+      font: 700 11px/1 'Manrope', sans-serif;
+    }
+
+    .question-label {
+      display: block;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.65;
+    }
+
+    .question-label-en {
+      display: block;
+      color: var(--text-3);
+      font: 400 11px/1.55 'Manrope', sans-serif;
+      margin-top: 5px;
+    }
+
+    .rating-options {
+      display: flex;
+      gap: 8px;
+      margin: 16px -2px 0;
+      padding: 2px 2px 8px;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      scrollbar-width: thin;
+    }
+
+    .rating-choice { flex: 1 0 44px; min-width: 44px; }
+    .rating-choice input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .rating-choice span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface-2);
+      color: var(--text-2);
+      font: 700 13px/1 'Manrope', sans-serif;
+      cursor: pointer;
+      transition: color .2s, background .2s, border-color .2s, box-shadow .2s, transform .15s;
+    }
+
+    .rating-choice input:checked + span {
+      color: #fff;
+      background: var(--brand);
+      border-color: var(--brand);
+      box-shadow: 0 5px 14px rgba(186,43,43,.18);
+    }
+
+    .rating-choice input:focus-visible + span {
+      outline: 2px solid var(--brand);
+      outline-offset: 2px;
+    }
+
+    .rating-choice span:active { transform: scale(.96); }
+
+    .scale-labels {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      color: var(--text-3);
+      font-size: 10px;
+      line-height: 1.45;
+      margin-top: 3px;
+    }
+
+    .scale-labels span:last-child { text-align: right; }
+
+    .text-answer {
+      width: 100%;
+      min-height: 126px;
+      margin-top: 15px;
+      padding: 13px 14px;
+      resize: vertical;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface-2);
+      color: var(--text);
+      font: 400 16px/1.6 'Prompt', sans-serif;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+
+    .text-answer:focus {
+      outline: none;
+      border-color: var(--brand);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px var(--brand-dim);
+    }
+
+    .text-answer::placeholder { color: var(--text-3); }
+
+    .text-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 7px;
+      color: var(--text-3);
+      font-size: 10px;
+    }
+
+    .field-error {
+      display: none;
+      color: var(--error);
+      font-size: 11px;
+      margin-top: 9px;
+    }
+
+    .question-block.has-error {
+      background: rgba(186,43,43,.035);
+    }
+
+    .question-block.has-error .field-error { display: block; }
+
+    .form-error {
+      display: none;
+      padding: 13px 15px;
+      border: 1px solid rgba(186,43,43,.25);
+      border-radius: 12px;
+      background: rgba(186,43,43,.06);
+      color: var(--error);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .form-error.visible { display: block; }
+
+    .submit-panel {
+      position: sticky;
+      bottom: 12px;
+      z-index: 20;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 12px 34px rgba(25,25,25,.12);
+    }
+
+    .submit-button {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid var(--brand);
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-light));
+      color: #fff;
+      cursor: pointer;
+      font: 600 14px/1 'Prompt', sans-serif;
+      box-shadow: 0 6px 16px rgba(186,43,43,.19);
+      transition: background .2s, box-shadow .2s, transform .15s, opacity .2s;
+    }
+
+    .submit-button:active { transform: scale(.98); }
+    .submit-button:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+    .submit-button:disabled { opacity: .55; cursor: wait; transform: none; box-shadow: none; }
+
+    .state-card {
+      padding: 42px 22px;
+      text-align: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 8px 26px rgba(25,25,25,.055);
+    }
+
+    .state-card svg { width: 38px; height: 38px; color: var(--brand); margin-bottom: 13px; }
+    .state-card h2 { font-size: 17px; margin-bottom: 7px; }
+    .state-card p { color: var(--text-2); font-size: 13px; line-height: 1.6; }
+    .state-card .btn { min-height: 44px; margin-top: 18px; }
+
+    .loading-stack { display: grid; gap: 14px; }
+    .loading-block { height: 190px; border-radius: var(--radius-lg); }
+
+    .result-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(25,25,25,.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .result-overlay.visible { display: flex; }
+
+    .result-card {
+      width: 100%;
+      max-width: 390px;
+      padding: 28px 22px;
+      text-align: center;
+      background: var(--surface);
+      border-radius: 20px;
+      box-shadow: 0 22px 55px rgba(0,0,0,.18);
+    }
+
+    .result-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 17px;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--success);
+    }
+
+    .result-icon svg { width: 29px; height: 29px; }
+    .result-card h2 { font-size: 19px; margin-bottom: 7px; }
+    .result-card p { color: var(--text-2); font-size: 13px; line-height: 1.6; }
+
+    @media (max-width: 375px) {
+      .page-body { padding-inline: 16px; }
+      .question-block { padding-inline: 16px; }
+      .section-heading { padding-inline: 16px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <button class="page-header__back" id="backButton" type="button" aria-label="กลับหน้าตารางหลักสูตร">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="M13 4l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      กลับ
+    </button>
+    <div class="page-header__title">EVALUATION</div>
+    <div style="width:44px" aria-hidden="true"></div>
+  </header>
+
+  <main class="page-body" id="mainContent">
+    <section class="evaluation-intro" aria-labelledby="evaluationTitle">
+      <div class="evaluation-eyebrow">COURSE FEEDBACK</div>
+      <h1 class="evaluation-title" id="evaluationTitle">Course Evaluation</h1>
+      <div class="evaluation-course" id="courseName">กำลังโหลดหลักสูตร...</div>
+      <p class="evaluation-copy">ความคิดเห็นของคุณจะใช้สำหรับพัฒนาหลักสูตรและประสบการณ์การเรียนรู้ในครั้งถัดไป</p>
+      <div class="required-note"><span class="required-mark">*</span> คำถามที่จำเป็นต้องตอบ</div>
+    </section>
+
+    <div id="evaluationContent" aria-live="polite" aria-busy="true">
+      <div class="loading-stack" aria-label="กำลังโหลดแบบประเมิน">
+        <div class="skeleton loading-block"></div>
+        <div class="skeleton loading-block"></div>
+        <div class="skeleton loading-block"></div>
+      </div>
+    </div>
+  </main>
+
+  <div class="result-overlay" id="resultOverlay" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+    <div class="result-card">
+      <div class="result-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M5 12l4 4L19 6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 id="resultTitle">ส่งแบบประเมินเรียบร้อย</h2>
+      <p>ขอบคุณสำหรับความคิดเห็น ระบบบันทึกข้อมูลของคุณแล้ว</p>
+      <button class="btn btn--full" type="button" style="margin-top:20px;background:var(--brand);color:#fff;" onclick="location.href='calendar.html'">กลับหน้า Calendar</button>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script>
+    const session = Session.require();
+    const params = new URLSearchParams(window.location.search);
+    const courseId = String(params.get('course') || '').trim().toUpperCase();
+    let questions = [];
+    let submitting = false;
+    let dirty = false;
+
+    function validCourseId() {
+      return /^[A-Z0-9_-]{2,30}$/.test(courseId);
+    }
+
+    function textElement(tag, className, text) {
+      const element = document.createElement(tag);
+      if (className) element.className = className;
+      element.textContent = text || '';
+      return element;
+    }
+
+    function renderState(title, message, allowRetry) {
+      const content = document.getElementById('evaluationContent');
+      content.setAttribute('aria-busy', 'false');
+      content.innerHTML = '';
+
+      const card = document.createElement('section');
+      card.className = 'state-card';
+      card.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01" stroke-linecap="round"/></svg>';
+      card.append(textElement('h2', '', title), textElement('p', '', message));
+
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'btn btn--ghost';
+      button.textContent = allowRetry ? 'ลองใหม่' : 'กลับหน้า Calendar';
+      button.addEventListener('click', allowRetry ? loadEvaluation : () => { location.href = 'calendar.html'; });
+      card.appendChild(button);
+      content.appendChild(card);
+    }
+
+    function buildRatingQuestion(question, questionIndex) {
+      const fieldset = document.createElement('fieldset');
+      fieldset.className = 'question-block';
+      fieldset.dataset.questionId = question.QuestionID;
+
+      fieldset.appendChild(textElement('span', 'question-number', String(questionIndex + 1)));
+      const legend = textElement('legend', 'question-label', question.QuestionTH);
+      if (question.Required) legend.appendChild(textElement('span', 'required-mark', ' *'));
+      fieldset.appendChild(legend);
+      if (question.QuestionEN) fieldset.appendChild(textElement('span', 'question-label-en', question.QuestionEN));
+
+      const options = document.createElement('div');
+      options.className = 'rating-options';
+      options.setAttribute('role', 'radiogroup');
+      options.setAttribute('aria-label', question.QuestionTH);
+
+      const min = Number(question.MinScore);
+      const max = Number(question.MaxScore);
+      for (let score = min; score <= max; score++) {
+        const label = document.createElement('label');
+        label.className = 'rating-choice';
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = question.QuestionID;
+        input.value = String(score);
+        input.required = Boolean(question.Required);
+        input.addEventListener('change', () => {
+          dirty = true;
+          fieldset.classList.remove('has-error');
+        });
+        label.append(input, textElement('span', '', String(score)));
+        options.appendChild(label);
+      }
+      fieldset.appendChild(options);
+
+      const scaleLabels = document.createElement('div');
+      scaleLabels.className = 'scale-labels';
+      scaleLabels.append(
+        textElement('span', '', `${min} = ${question.MinLabel || 'คะแนนต่ำสุด'}`),
+        textElement('span', '', `${max} = ${question.MaxLabel || 'คะแนนสูงสุด'}`)
+      );
+      fieldset.appendChild(scaleLabels);
+      fieldset.appendChild(textElement('div', 'field-error', 'กรุณาเลือกคะแนน'));
+      return fieldset;
+    }
+
+    function buildTextQuestion(question, questionIndex) {
+      const block = document.createElement('div');
+      block.className = 'question-block';
+      block.dataset.questionId = question.QuestionID;
+
+      block.appendChild(textElement('span', 'question-number', String(questionIndex + 1)));
+      const label = textElement('label', 'question-label', question.QuestionTH);
+      label.htmlFor = `answer-${question.QuestionID}`;
+      if (question.Required) label.appendChild(textElement('span', 'required-mark', ' *'));
+      block.appendChild(label);
+      if (question.QuestionEN) block.appendChild(textElement('span', 'question-label-en', question.QuestionEN));
+
+      const textarea = document.createElement('textarea');
+      textarea.className = 'text-answer';
+      textarea.id = `answer-${question.QuestionID}`;
+      textarea.name = question.QuestionID;
+      textarea.maxLength = 1000;
+      textarea.required = Boolean(question.Required);
+      textarea.placeholder = 'พิมพ์ความคิดเห็นของคุณ...';
+
+      const counter = textElement('span', '', '0/1,000');
+      textarea.addEventListener('input', () => {
+        dirty = true;
+        counter.textContent = `${textarea.value.length.toLocaleString('th-TH')}/1,000`;
+        block.classList.remove('has-error');
+      });
+      block.appendChild(textarea);
+
+      const meta = document.createElement('div');
+      meta.className = 'text-meta';
+      meta.append(textElement('span', '', question.Required ? 'จำเป็นต้องตอบ' : 'ไม่บังคับ'), counter);
+      block.appendChild(meta);
+      block.appendChild(textElement('div', 'field-error', 'กรุณากรอกความคิดเห็น'));
+      return block;
+    }
+
+    function buildForm() {
+      const content = document.getElementById('evaluationContent');
+      const form = document.createElement('form');
+      form.className = 'evaluation-form';
+      form.noValidate = true;
+
+      const sections = new Map();
+      questions.forEach((question, index) => {
+        const sectionKey = question.SectionTH || 'แบบประเมิน';
+        if (!sections.has(sectionKey)) {
+          const section = document.createElement('section');
+          section.className = 'evaluation-section';
+          const heading = document.createElement('div');
+          heading.className = 'section-heading';
+          heading.append(
+            textElement('h2', '', sectionKey),
+            textElement('p', '', question.SectionEN || '')
+          );
+          section.appendChild(heading);
+          sections.set(sectionKey, section);
+          form.appendChild(section);
+        }
+
+        const questionElement = question.AnswerType === 'rating'
+          ? buildRatingQuestion(question, index)
+          : buildTextQuestion(question, index);
+        sections.get(sectionKey).appendChild(questionElement);
+      });
+
+      const error = textElement('div', 'form-error', 'กรุณาตอบคำถามที่จำเป็นให้ครบก่อนส่งแบบประเมิน');
+      error.id = 'formError';
+      error.setAttribute('role', 'alert');
+      form.appendChild(error);
+
+      const submitPanel = document.createElement('div');
+      submitPanel.className = 'submit-panel';
+      const submitButton = document.createElement('button');
+      submitButton.type = 'submit';
+      submitButton.className = 'submit-button';
+      submitButton.id = 'submitButton';
+      submitButton.textContent = 'ส่งแบบประเมิน';
+      submitPanel.appendChild(submitButton);
+      form.appendChild(submitPanel);
+
+      form.addEventListener('submit', submitEvaluationForm);
+      content.replaceChildren(form);
+      content.setAttribute('aria-busy', 'false');
+    }
+
+    function collectAnswers() {
+      const answers = {};
+      let firstInvalid = null;
+
+      document.querySelectorAll('.question-block').forEach(block => block.classList.remove('has-error'));
+      document.getElementById('formError').classList.remove('visible');
+
+      questions.forEach(question => {
+        const block = document.querySelector(`[data-question-id="${CSS.escape(question.QuestionID)}"]`);
+        let value = '';
+
+        if (question.AnswerType === 'rating') {
+          const selected = document.querySelector(`input[name="${CSS.escape(question.QuestionID)}"]:checked`);
+          value = selected ? Number(selected.value) : '';
+        } else {
+          const textarea = document.querySelector(`textarea[name="${CSS.escape(question.QuestionID)}"]`);
+          value = textarea ? textarea.value.trim() : '';
+        }
+
+        answers[question.QuestionID] = value;
+        if (question.Required && value === '') {
+          block.classList.add('has-error');
+          if (!firstInvalid) firstInvalid = block;
+        }
+      });
+
+      return { answers, firstInvalid };
+    }
+
+    async function submitEvaluationForm(event) {
+      event.preventDefault();
+      if (submitting) return;
+
+      const collected = collectAnswers();
+      if (collected.firstInvalid) {
+        document.getElementById('formError').classList.add('visible');
+        collected.firstInvalid.scrollIntoView({
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+          block: 'center'
+        });
+        const focusTarget = collected.firstInvalid.querySelector('input, textarea');
+        if (focusTarget) focusTarget.focus({ preventScroll: true });
+        return;
+      }
+
+      if (!confirm('ยืนยันส่งแบบประเมิน? เมื่อส่งแล้วจะไม่สามารถแก้ไขได้')) return;
+
+      submitting = true;
+      const button = document.getElementById('submitButton');
+      button.disabled = true;
+      button.textContent = 'กำลังบันทึก...';
+
+      const result = await api('submitEvaluation', {
+        empId: session.empId,
+        courseId,
+        answers: collected.answers
+      });
+
+      if (!result.success) {
+        submitting = false;
+        button.disabled = false;
+        button.textContent = 'ส่งแบบประเมิน';
+        showToast(result.message || 'ส่งแบบประเมินไม่สำเร็จ', 'error', 4500);
+        return;
+      }
+
+      dirty = false;
+      document.getElementById('resultOverlay').classList.add('visible');
+      document.querySelector('#resultOverlay button').focus();
+    }
+
+    async function loadEvaluation() {
+      if (!session) return;
+      if (!validCourseId()) {
+        renderState('ลิงก์แบบประเมินไม่ถูกต้อง', 'กรุณาเปิดแบบประเมินผ่านหน้า Calendar', false);
+        return;
+      }
+
+      const result = await api('getEvaluation', {
+        empId: session.empId,
+        courseId
+      });
+
+      if (!result.success) {
+        renderState(
+          result.completed ? 'ทำแบบประเมินแล้ว' : 'โหลดแบบประเมินไม่สำเร็จ',
+          result.message || 'กรุณาลองใหม่อีกครั้ง',
+          !result.completed
+        );
+        return;
+      }
+
+      document.getElementById('courseName').textContent = `${result.courseId} — ${result.courseName}`;
+      questions = Array.isArray(result.questions) ? result.questions : [];
+      if (!questions.length) {
+        renderState('ยังไม่มีคำถาม', 'ผู้ดูแลระบบยังไม่ได้เพิ่มคำถามสำหรับหลักสูตรนี้', false);
+        return;
+      }
+      buildForm();
+    }
+
+    document.getElementById('backButton').addEventListener('click', () => {
+      if (dirty && !submitting && !confirm('ออกจากแบบประเมิน? คำตอบที่กรอกไว้จะไม่ถูกบันทึก')) return;
+      location.href = 'calendar.html';
+    });
+
+    window.addEventListener('beforeunload', event => {
+      if (!dirty || submitting) return;
+      event.preventDefault();
+      event.returnValue = '';
+    });
+
+    loadEvaluation();
+  </script>
+</body>
+</html>
