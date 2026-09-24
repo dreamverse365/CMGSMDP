@@ -74,7 +74,7 @@
     .course-meta__item { display: flex; align-items: flex-start; gap: 9px; color: var(--text-2); font-size: 12px; line-height: 1.45; }
     .course-meta__item svg { width: 15px; height: 15px; flex: 0 0 15px; color: var(--text-3); margin-top: 1px; }
     .course-actions {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 9px;
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px;
       padding: 13px 18px 15px 20px; border-top: 1px solid var(--border);
       background: var(--surface);
     }
@@ -371,6 +371,66 @@
   return button;
 }
 
+    function createEvaluationButton(course) {
+      const button = document.createElement('button');
+      const completed = isCompleted(course.EvaluationCompleted);
+      const postCompleted = isCompleted(course.PostTestCompleted);
+
+      // ใช้เงื่อนไขวันเดียวกับปุ่มข้อสอบ
+      const courseDate = parseCourseDate(course.Date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const isDateLocked = courseDate ? courseDate > today : false;
+
+      button.type = 'button';
+      button.className = 'test-btn';
+      button.setAttribute('aria-label', `Evaluate ${course.CourseName || ''}`);
+
+      // ทำแบบประเมินแล้ว
+      if (completed) {
+        button.classList.add('is-completed');
+        button.disabled = true;
+        button.setAttribute('aria-disabled', 'true');
+        button.append(
+          icon('<path d="M5 12l4 4L19 6" stroke-linecap="round" stroke-linejoin="round"/>'),
+          document.createTextNode('Evaluate — ทำแล้ว')
+        );
+        return button;
+      }
+
+      // ยังไม่ถึงวันหลักสูตร หรือยังทำ Post-test ไม่เสร็จ
+      if (isDateLocked || !postCompleted) {
+        button.classList.add('is-locked');
+        button.disabled = true;
+        button.setAttribute('aria-disabled', 'true');
+        button.title = isDateLocked
+          ? 'ยังไม่ถึงวันหลักสูตร'
+          : 'กรุณาทำ Post-test ให้เสร็จก่อน';
+        button.append(
+          icon('<path d="M7 11V8a5 5 0 0 1 10 0v3M6 11h12v10H6V11z" stroke-linecap="round" stroke-linejoin="round"/>'),
+          document.createTextNode('Evaluate')
+        );
+        return button;
+      }
+
+      // พร้อมทำแบบประเมิน
+      button.append(
+        icon('<path d="M4 20h16M6 17l2-7 4 4 6-9M17 5h2v2" stroke-linecap="round" stroke-linejoin="round"/>'),
+        document.createTextNode('Evaluate')
+      );
+
+      button.addEventListener('click', () => {
+        const courseId = String(course.CourseID || '').trim();
+        if (!courseId) {
+          showToast('ไม่พบรหัสหลักสูตร', 'error');
+          return;
+        }
+        window.location.href = `evaluation.html?course=${encodeURIComponent(courseId)}`;
+      });
+
+      return button;
+    }
+
     function createCourseCard(course) {
       const date = parseCourseDate(course.Date);
       const past = isPastCourse(course);
@@ -415,7 +475,11 @@
 
       const actions = document.createElement('div');
       actions.className = 'course-actions';
-      actions.append(createTestButton('Pre-test', 'pre', course), createTestButton('Post-test', 'post', course));
+      actions.append(
+        createTestButton('Pre-test', 'pre', course),
+        createTestButton('Post-test', 'post', course),
+        createEvaluationButton(course)
+      );
       card.append(accent, body, actions);
       return card;
     }
@@ -447,15 +511,25 @@
     async function loadCourses() {
       const content = document.getElementById('courseContent');
       content.setAttribute('aria-busy', 'true');
-      const result = await api('getCourses', {
-        empId: session.empId
-      });
+      const [result, evaluationStatus] = await Promise.all([
+        api('getCourses', { empId: session.empId }),
+        api('getEvaluationStatuses', { empId: session.empId })
+      ]);
       if (!result.success) {
         renderError(result.message);
         return;
       }
 
       courses = Array.isArray(result.courses) ? result.courses : [];
+      const completedEvaluationIds = evaluationStatus.success && Array.isArray(evaluationStatus.completedCourseIds)
+        ? evaluationStatus.completedCourseIds.map(id => String(id).trim().toUpperCase())
+        : [];
+
+      courses.forEach(course => {
+        course.EvaluationCompleted = completedEvaluationIds.includes(
+          String(course.CourseID || '').trim().toUpperCase()
+        );
+      });
       courses.sort((a, b) => {
         const dateA = parseCourseDate(a.Date)?.getTime() ?? Number.MAX_SAFE_INTEGER;
         const dateB = parseCourseDate(b.Date)?.getTime() ?? Number.MAX_SAFE_INTEGER;
