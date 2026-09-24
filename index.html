@@ -6,6 +6,7 @@
   <title>CMG Store Manager Development Program</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="images/bg.png">
   <link rel="stylesheet" href="css/app.css">
   <style>
     .brand__img {
@@ -29,8 +30,19 @@
       position: fixed;
       inset: 0;
       z-index: 0;
-      background: #f8f7f6;
+      background-color: #f5f5f5;
+      background-image: url('images/bg.png');
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
       overflow: hidden;
+    }
+
+    /* ปิดเอฟเฟกต์พื้นหลังเดิม เพื่อให้แสดงภาพ bg.png โดยไม่ถูกสี/เส้นทับ */
+    .bg-layer__blob,
+    .bg-layer__lines,
+    .bg-layer__vignette {
+      display: none;
     }
 
     /* Animated aurora blobs */
