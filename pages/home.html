@@ -491,18 +491,19 @@
     .nav-item::before {
   content: '';
   position: absolute;
-  top: 0; left: 20%; right: 20%;
-  height: 2.5px;
+  top: -8px;
+  left: 50%;
+  width: 24px;
+  height: 3px;
   background: var(--brand);
   border-radius: 0 0 3px 3px;
+  transform: translateX(-50%);
   opacity: 0;
-  transform: scaleX(0.4);
-  transition: opacity 0.2s, transform 0.2s;
+  transition: opacity 0.2s;
 }
 
 .nav-item.active::before {
   opacity: 1;
-  transform: scaleX(1);
 }
 
     .nav-item:hover { color: var(--brand); }
