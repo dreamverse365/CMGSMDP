@@ -107,6 +107,87 @@
     }
     .result-card .btn { min-height: 48px; margin-top: 22px; }
 
+    /* ใช้ Prompt กับข้อความและปุ่มทั้งหมดในระบบ Test */
+    body,
+    body * {
+      font-family: 'Prompt', sans-serif !important;
+    }
+
+    /* Custom confirmation modal — ไม่แสดงชื่อโดเมนของเว็บไซต์ */
+    .confirm-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 350;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(20, 20, 20, .56);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .confirm-overlay.visible { display: flex; }
+    .confirm-card {
+      width: 100%;
+      max-width: 380px;
+      padding: 28px 24px 22px;
+      text-align: center;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .22);
+      animation: confirmIn .22s ease-out;
+    }
+    .confirm-icon {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 17px;
+      border-radius: 50%;
+      color: var(--brand);
+      background: var(--brand-dim);
+    }
+    .confirm-icon svg { width: 28px; height: 28px; }
+    .confirm-title {
+      color: var(--text);
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+    .confirm-message {
+      color: var(--text-2);
+      font-size: 13px;
+      line-height: 1.7;
+      margin-top: 8px;
+    }
+    .confirm-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 22px;
+    }
+    .confirm-actions .btn { min-height: 48px; }
+    .confirm-submit {
+      border: 1px solid var(--brand);
+      background: linear-gradient(135deg, var(--brand), var(--brand-light));
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(186, 43, 43, .18);
+    }
+    .confirm-submit:hover {
+      background: var(--brand-hover);
+      border-color: var(--brand-hover);
+    }
+    .confirm-submit:focus-visible,
+    .confirm-cancel:focus-visible {
+      outline: 2px solid var(--brand);
+      outline-offset: 3px;
+    }
+    @keyframes confirmIn {
+      from { opacity: 0; transform: translateY(10px) scale(.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
     .page-header__back { min-width: 44px; min-height: 44px; }
     button:focus-visible, label:has(input:focus-visible), a:focus-visible {
       outline: 2px solid var(--gold-light); outline-offset: 3px;
@@ -115,6 +196,9 @@
       .test-shell { padding-inline: 16px; }
       .question-card { padding-inline: 16px; }
       .choice { padding-inline: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .confirm-card { animation: none; }
     }
   </style>
 </head>
@@ -142,6 +226,23 @@
       </div>
     </div>
   </main>
+
+  <div class="confirm-overlay" id="confirmOverlay" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+    <div class="confirm-card">
+      <div class="confirm-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+          <path d="M12 3l9 16H3L12 3z" stroke-linejoin="round"/>
+          <path d="M12 9v4M12 17h.01" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 class="confirm-title" id="confirmTitle">ยืนยันส่งคำตอบ</h2>
+      <p class="confirm-message" id="confirmMessage">เมื่อส่งแล้วจะไม่สามารถกลับมาแก้ไขหรือทำแบบทดสอบนี้ซ้ำได้</p>
+      <div class="confirm-actions">
+        <button class="btn btn--ghost confirm-cancel" id="confirmCancel" type="button">ยกเลิก</button>
+        <button class="btn confirm-submit" id="confirmAccept" type="button">ยืนยันส่ง</button>
+      </div>
+    </div>
+  </div>
 
   <div class="result-overlay" id="resultOverlay" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
     <div class="result-card">
@@ -174,6 +275,8 @@ const testType = (
     let questions = [];
     let currentIndex = 0;
     let submitting = false;
+    let confirmResolver = null;
+    let confirmPreviousFocus = null;
 
     function validRequest() {
       return courseId && ['pre', 'post'].includes(testType);
@@ -185,6 +288,49 @@ const testType = (
       element.textContent = text ?? '';
       return element;
     }
+
+    function closeConfirm(result) {
+      const overlay = document.getElementById('confirmOverlay');
+      if (!overlay.classList.contains('visible')) return;
+
+      overlay.classList.remove('visible');
+      document.body.style.overflow = '';
+
+      const resolver = confirmResolver;
+      confirmResolver = null;
+
+      if (confirmPreviousFocus && typeof confirmPreviousFocus.focus === 'function') {
+        confirmPreviousFocus.focus();
+      }
+      confirmPreviousFocus = null;
+      if (resolver) resolver(result);
+    }
+
+    function openConfirm(options = {}) {
+      const overlay = document.getElementById('confirmOverlay');
+      document.getElementById('confirmTitle').textContent = options.title || 'ยืนยันรายการ';
+      document.getElementById('confirmMessage').textContent = options.message || 'กรุณายืนยันเพื่อดำเนินการต่อ';
+      document.getElementById('confirmAccept').textContent = options.confirmText || 'ยืนยัน';
+      document.getElementById('confirmCancel').textContent = options.cancelText || 'ยกเลิก';
+
+      confirmPreviousFocus = document.activeElement;
+      overlay.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+      requestAnimationFrame(() => document.getElementById('confirmAccept').focus());
+
+      return new Promise(resolve => {
+        confirmResolver = resolve;
+      });
+    }
+
+    document.getElementById('confirmAccept').addEventListener('click', () => closeConfirm(true));
+    document.getElementById('confirmCancel').addEventListener('click', () => closeConfirm(false));
+    document.getElementById('confirmOverlay').addEventListener('click', event => {
+      if (event.target === event.currentTarget) closeConfirm(false);
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') closeConfirm(false);
+    });
 
     function renderState(title, message, retry = false) {
       const content = document.getElementById('testContent');
@@ -314,7 +460,13 @@ const testType = (
 
     async function submitAnswers() {
       if (submitting || Object.keys(answers).length !== questions.length) return;
-      if (!confirm('ยืนยันส่งคำตอบ? เมื่อส่งแล้วจะไม่สามารถทำแบบทดสอบนี้ซ้ำได้')) return;
+      const confirmed = await openConfirm({
+        title: 'ยืนยันส่งคำตอบ',
+        message: 'เมื่อตัดสินใจส่งแล้ว จะไม่สามารถกลับมาแก้ไขหรือทำแบบทดสอบนี้ซ้ำได้',
+        confirmText: 'ยืนยันส่ง',
+        cancelText: 'ตรวจคำตอบอีกครั้ง'
+      });
+      if (!confirmed) return;
 
       submitting = true;
       const button = document.getElementById('submitButton');
@@ -347,9 +499,15 @@ const testType = (
       document.getElementById('resultOverlay').classList.add('visible');
     }
 
-    document.getElementById('backButton').addEventListener('click', () => {
+    document.getElementById('backButton').addEventListener('click', async () => {
       if (Object.keys(answers).length > 0 && !submitting) {
-        if (!confirm('ออกจากแบบทดสอบ? คำตอบที่เลือกไว้จะไม่ถูกบันทึก')) return;
+        const confirmed = await openConfirm({
+          title: 'ออกจากแบบทดสอบ?',
+          message: 'คำตอบที่เลือกไว้จะไม่ถูกบันทึก หากออกจากหน้านี้',
+          confirmText: 'ออกจากแบบทดสอบ',
+          cancelText: 'ทำแบบทดสอบต่อ'
+        });
+        if (!confirmed) return;
       }
       location.href = 'calendar.html';
     });
