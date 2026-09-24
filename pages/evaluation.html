@@ -365,6 +365,85 @@
     .result-card h2 { font-size: 19px; margin-bottom: 7px; }
     .result-card p { color: var(--text-2); font-size: 13px; line-height: 1.6; }
 
+    /* ── Custom confirm modal ── */
+    .confirm-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 350;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(20,20,20,.56);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .confirm-overlay.visible { display: flex; }
+    .confirm-card {
+      width: 100%;
+      max-width: 380px;
+      padding: 28px 24px 22px;
+      text-align: center;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl, 20px);
+      background: var(--surface);
+      box-shadow: 0 24px 70px rgba(0,0,0,.22);
+      animation: confirmIn .22s ease-out;
+    }
+    .confirm-icon {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 17px;
+      border-radius: 50%;
+      color: var(--brand);
+      background: var(--brand-dim);
+    }
+    .confirm-icon svg { width: 28px; height: 28px; }
+    .confirm-title {
+      color: var(--text);
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+    .confirm-message {
+      color: var(--text-2);
+      font-size: 13px;
+      line-height: 1.7;
+      margin-top: 8px;
+    }
+    .confirm-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 22px;
+    }
+    .confirm-actions .btn { min-height: 48px; }
+    .confirm-submit {
+      border: 1px solid var(--brand);
+      background: linear-gradient(135deg, var(--brand), var(--brand-light));
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(186,43,43,.18);
+      border-radius: 12px;
+      font: 600 14px/1 'Prompt', sans-serif;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+    .confirm-submit:active { opacity: .85; }
+    .confirm-submit:focus-visible,
+    .confirm-cancel:focus-visible {
+      outline: 2px solid var(--brand);
+      outline-offset: 3px;
+    }
+    @keyframes confirmIn {
+      from { opacity: 0; transform: translateY(10px) scale(.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .confirm-card { animation: none; }
+    }
+
     @media (max-width: 375px) {
       .page-body { padding-inline: 16px; }
       .question-block { padding-inline: 16px; }
@@ -406,6 +485,23 @@
     </div>
   </main>
 
+  <div class="confirm-overlay" id="confirmOverlay" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+    <div class="confirm-card">
+      <div class="confirm-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+          <path d="M12 3l9 16H3L12 3z" stroke-linejoin="round"/>
+          <path d="M12 9v4M12 17h.01" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 class="confirm-title" id="confirmTitle">ยืนยันรายการ</h2>
+      <p class="confirm-message" id="confirmMessage"></p>
+      <div class="confirm-actions">
+        <button class="btn btn--ghost confirm-cancel" id="confirmCancel" type="button">ยกเลิก</button>
+        <button class="btn confirm-submit" id="confirmAccept" type="button">ยืนยัน</button>
+      </div>
+    </div>
+  </div>
+
   <div class="result-overlay" id="resultOverlay" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
     <div class="result-card">
       <div class="result-icon">
@@ -421,6 +517,40 @@
 
   <script src="../js/config.js"></script>
   <script>
+    // ── Custom confirm modal ──
+    let confirmResolver = null;
+    let confirmPreviousFocus = null;
+
+    function closeConfirm(result) {
+      const overlay = document.getElementById('confirmOverlay');
+      if (!overlay.classList.contains('visible')) return;
+      overlay.classList.remove('visible');
+      document.body.style.overflow = '';
+      const resolver = confirmResolver;
+      confirmResolver = null;
+      if (confirmPreviousFocus?.focus) confirmPreviousFocus.focus();
+      confirmPreviousFocus = null;
+      if (resolver) resolver(result);
+    }
+
+    function openConfirm(options = {}) {
+      const overlay = document.getElementById('confirmOverlay');
+      document.getElementById('confirmTitle').textContent = options.title || 'ยืนยันรายการ';
+      document.getElementById('confirmMessage').textContent = options.message || '';
+      document.getElementById('confirmAccept').textContent = options.confirmText || 'ยืนยัน';
+      document.getElementById('confirmCancel').textContent = options.cancelText || 'ยกเลิก';
+      confirmPreviousFocus = document.activeElement;
+      overlay.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+      requestAnimationFrame(() => document.getElementById('confirmAccept').focus());
+      return new Promise(resolve => { confirmResolver = resolve; });
+    }
+
+    document.getElementById('confirmAccept').addEventListener('click', () => closeConfirm(true));
+    document.getElementById('confirmCancel').addEventListener('click', () => closeConfirm(false));
+    document.getElementById('confirmOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeConfirm(false); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeConfirm(false); });
+
     const session = Session.require();
     const params = new URLSearchParams(window.location.search);
     const courseId = String(params.get('course') || '').trim().toUpperCase();
@@ -663,7 +793,13 @@
         return;
       }
 
-      if (!confirm('ยืนยันส่งแบบประเมิน? เมื่อส่งแล้วจะไม่สามารถแก้ไขได้')) return;
+      const confirmed = await openConfirm({
+        title: 'ยืนยันส่งแบบประเมิน',
+        message: 'เมื่อส่งแล้วจะไม่สามารถกลับมาแก้ไขได้',
+        confirmText: 'ยืนยันส่ง',
+        cancelText: 'ตรวจสอบอีกครั้ง'
+      });
+      if (!confirmed) return;
 
       submitting = true;
       const button = document.getElementById('submitButton');
@@ -719,8 +855,16 @@
       buildForm();
     }
 
-    document.getElementById('backButton').addEventListener('click', () => {
-      if (dirty && !submitting && !confirm('ออกจากแบบประเมิน? คำตอบที่กรอกไว้จะไม่ถูกบันทึก')) return;
+    document.getElementById('backButton').addEventListener('click', async () => {
+      if (dirty && !submitting) {
+        const confirmed = await openConfirm({
+          title: 'ออกจากแบบประเมิน?',
+          message: 'คำตอบที่กรอกไว้จะไม่ถูกบันทึก หากออกจากหน้านี้',
+          confirmText: 'ออกจากหน้านี้',
+          cancelText: 'ทำแบบประเมินต่อ'
+        });
+        if (!confirmed) return;
+      }
       location.href = 'calendar.html';
     });
 
