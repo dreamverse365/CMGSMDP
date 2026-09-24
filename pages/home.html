@@ -8,106 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/app.css">
   <style>
-  /* ── LOGOUT MODAL ── */
-.logout-modal-overlay {
-  position: fixed; inset: 0; z-index: 400;
-  background: rgba(0,0,0,0.40);
-  backdrop-filter: blur(6px);
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.25s;
-  display: flex; align-items: center; justify-content: center;
-  padding: 24px;
-}
-.logout-modal-overlay.visible {
-  opacity: 1; pointer-events: all;
-}
-
-.logout-modal {
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 32px 28px 28px;
-  max-width: 320px;
-  width: 100%;
-  text-align: center;
-  box-shadow: 0 32px 80px rgba(25,25,25,0.18);
-  transform: scale(0.92) translateY(10px);
-  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-}
-.logout-modal-overlay.visible .logout-modal {
-  transform: scale(1) translateY(0);
-}
-
-.logout-modal__icon {
-  width: 52px; height: 52px;
-  background: var(--brand-soft);
-  border: 1px solid rgba(186,43,43,0.18);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 18px;
-}
-.logout-modal__icon svg {
-  width: 22px; height: 22px;
-  color: var(--brand);
-}
-
-.logout-modal__title {
-  font-family: 'Prompt', sans-serif;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 8px;
-}
-
-.logout-modal__body {
-  font-size: 13px;
-  color: var(--text-3);
-  line-height: 1.6;
-  margin-bottom: 24px;
-}
-
-.logout-modal__actions {
-  display: flex;
-  gap: 10px;
-}
-
-.btn-cancel {
-  flex: 1;
-  padding: 13px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-family: 'Prompt', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-2);
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-.btn-cancel:hover {
-  background: var(--surface-3);
-  color: var(--text);
-}
-
-.btn-logout-confirm {
-  flex: 1;
-  padding: 13px;
-  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-light) 100%);
-  border: none;
-  border-radius: var(--radius-sm);
-  font-family: 'Prompt', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  color: #ffffff;
-  cursor: pointer;
-  box-shadow: 0 6px 18px rgba(186,43,43,0.22);
-  transition: opacity 0.2s, box-shadow 0.2s;
-}
-.btn-logout-confirm:hover {
-  opacity: 0.9;
-  box-shadow: 0 8px 22px rgba(186,43,43,0.30);
-}
-  <style>
 
     :root {
       --brand:       #ba2b2b;
@@ -654,6 +554,107 @@
 
     .sk-name { width: 140px; height: 22px; margin-bottom: 6px; display: block; }
     .sk-sub  { width: 100px; height: 14px; margin-top: 6px; display: block; }
+
+    /* ── LOGOUT MODAL ── */
+    .logout-modal-overlay {
+      position: fixed; inset: 0; z-index: 400;
+      background: rgba(0,0,0,0.40);
+      backdrop-filter: blur(6px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .logout-modal-overlay.visible {
+      opacity: 1; pointer-events: all;
+    }
+
+    .logout-modal {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 32px 28px 28px;
+      max-width: 320px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 32px 80px rgba(25,25,25,0.18);
+      transform: scale(0.92) translateY(10px);
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .logout-modal-overlay.visible .logout-modal {
+      transform: scale(1) translateY(0);
+    }
+
+    .logout-modal__icon {
+      width: 52px; height: 52px;
+      background: var(--brand-soft);
+      border: 1px solid rgba(186,43,43,0.18);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 18px;
+    }
+    .logout-modal__icon svg {
+      width: 22px; height: 22px;
+      color: var(--brand);
+    }
+
+    .logout-modal__title {
+      font-family: 'Prompt', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .logout-modal__body {
+      font-size: 13px;
+      color: var(--text-3);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .logout-modal__actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-cancel {
+      flex: 1;
+      padding: 13px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: 'Prompt', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-cancel:hover {
+      background: var(--surface-3);
+      color: var(--text);
+    }
+
+    .btn-logout-confirm {
+      flex: 1;
+      padding: 13px;
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-light) 100%);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'Prompt', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(186,43,43,0.22);
+      transition: opacity 0.2s, box-shadow 0.2s;
+    }
+    .btn-logout-confirm:hover {
+      opacity: 0.9;
+      box-shadow: 0 8px 22px rgba(186,43,43,0.30);
+    }
+
   </style>
 </head>
 <body>
@@ -781,7 +782,7 @@
 
 </main>
 
-<!-- BOTTOM NAV — 5 tabs -->
+<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <a class="nav-item active" href="home.html">
     <div class="nav-icon-wrap">
@@ -834,6 +835,24 @@
     <div class="sheet-handle"></div>
     <h3 class="sheet-title">ประวัติ Point</h3>
     <div class="history-list" id="historyList"></div>
+  </div>
+</div>
+
+<!-- LOGOUT MODAL -->
+<div class="logout-modal-overlay" id="logoutModal" onclick="closeLogoutModal(event)">
+  <div class="logout-modal" onclick="event.stopPropagation()">
+    <div class="logout-modal__icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M15 3h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-4M10 17l5-5-5-5M15 12H3"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h2 class="logout-modal__title">ออกจากระบบ?</h2>
+    <p class="logout-modal__body">คุณต้องการออกจากระบบใช่ไหม<br>จะต้องเข้าสู่ระบบใหม่อีกครั้ง</p>
+    <div class="logout-modal__actions">
+      <button class="btn-cancel" onclick="closeLogoutModal()">ยกเลิก</button>
+      <button class="btn-logout-confirm" onclick="confirmLogout()">ออกจากระบบ</button>
+    </div>
   </div>
 </div>
 
@@ -1001,22 +1020,5 @@ function confirmLogout() {
 refreshProfile();
 loadUpcoming();
 </script>
-  <!-- LOGOUT MODAL -->
-<div class="logout-modal-overlay" id="logoutModal" onclick="closeLogoutModal(event)">
-  <div class="logout-modal" onclick="event.stopPropagation()">
-    <div class="logout-modal__icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M15 3h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-4M10 17l5-5-5-5M15 12H3"
-              stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-    <h2 class="logout-modal__title">ออกจากระบบ?</h2>
-    <p class="logout-modal__body">คุณต้องการออกจากระบบใช่ไหม<br>จะต้องเข้าสู่ระบบใหม่อีกครั้ง</p>
-    <div class="logout-modal__actions">
-      <button class="btn-cancel" onclick="closeLogoutModal()">ยกเลิก</button>
-      <button class="btn-logout-confirm" onclick="confirmLogout()">ออกจากระบบ</button>
-    </div>
-  </div>
-</div>
 </body>
 </html>
