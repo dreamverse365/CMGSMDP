@@ -213,6 +213,7 @@
     <section class="ranking-intro" aria-labelledby="rankingTitle">
       <div class="ranking-eyebrow">LEADERBOARD</div>
       <h1 class="ranking-title" id="rankingTitle">Top 10 Ranking</h1>
+      <p class="redeem-copy">อันดับคะแนนสะสม</p>
     </section>
 
     <div id="rankingContent" aria-live="polite" aria-busy="true">
@@ -360,10 +361,6 @@
 
       // ใหม่ — ย้าย label ขึ้นมาก่อน leader card
 const fragment = document.createDocumentFragment();
-
-const label = createTextElement('p', 'section-label', 'อันดับคะแนนสะสม');
-fragment.appendChild(label);                        // ← label ขึ้นมาก่อน
-
 fragment.appendChild(renderLeader(result.ranking[0]));
 
 if (result.ranking.length > 1) {
