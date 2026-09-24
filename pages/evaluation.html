@@ -198,13 +198,19 @@
     /* ── Rating: two-row grid (> 5 options) ── */
     .rating-options--grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
+      grid-template-columns: repeat(var(--rating-cols, 5), 1fr);
+      gap: 6px;
       margin-top: 16px;
     }
 
     .rating-options--grid .rating-choice {
       flex: unset;
+    }
+
+    .rating-options--grid .rating-choice span {
+      min-height: 38px;
+      font-size: 12px;
+      border-radius: 8px;
     }
 
     .scale-labels {
@@ -618,8 +624,10 @@
 
       // > 5 options → 2-row grid (5 per row); ≤ 5 → single flex row
       const useGrid = count > 5;
+      const cols = useGrid ? Math.ceil(count / 2) : count;
       const options = document.createElement('div');
       options.className = useGrid ? 'rating-options--grid' : 'rating-options';
+      if (useGrid) options.style.setProperty('--rating-cols', cols);
       options.setAttribute('role', 'radiogroup');
       options.setAttribute('aria-label', question.QuestionTH);
 
