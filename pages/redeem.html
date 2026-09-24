@@ -8,7 +8,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/app.css">
   <style>
-    body { font-family: 'Inter', 'Noto Sans Thai', sans-serif; }
+    body {
+      font-family: 'Prompt', sans-serif;
+      background: var(--bg);
+      padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+    }
     body::before {
       content: '';
       position: fixed;
