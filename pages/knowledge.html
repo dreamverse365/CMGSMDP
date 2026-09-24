@@ -25,7 +25,11 @@
 <body>
   <header class="page-header"><button class="page-header__back" onclick="history.back()" aria-label="ย้อนกลับ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m15 18-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>กลับ</button><div class="page-header__title">KNOWLEDGE</div><div style="width:42px"></div></header>
   <main class="page-body">
-    <p class="section-label">คลังความรู้</p>
+  <section class="calendar-intro" aria-labelledby="knowledgeTitle">
+    <div class="calendar-eyebrow">LEARNING JOURNEY</div>
+    <h1 class="calendar-title" id="knowledgeTitle">Knowledge Base</h1>
+    <p class="calendar-copy">คลังความรู้สำหรับการพัฒนา</p>
+  </section>
     <div class="knowledge-search"><input id="searchInput" type="search" placeholder="ค้นหาชื่อหรือรายละเอียด"><select id="categoryFilter"><option value="ALL">ทุกหมวดหมู่</option></select></div>
     <div class="knowledge-grid" id="knowledgeList"><div class="empty-state"><div class="skeleton" style="width:100%;height:80px"></div></div></div>
   </main>
