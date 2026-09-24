@@ -358,17 +358,20 @@
         return;
       }
 
-      const fragment = document.createDocumentFragment();
-      fragment.appendChild(renderLeader(result.ranking[0]));
+      // ใหม่ — ย้าย label ขึ้นมาก่อน leader card
+const fragment = document.createDocumentFragment();
 
-      if (result.ranking.length > 1) {
-        const label = createTextElement('p', 'section-label', 'อันดับคะแนนสะสม');
-        fragment.appendChild(label);
-        const list = document.createElement('div');
-        list.className = 'ranking-list';
-        result.ranking.slice(1).forEach(user => list.appendChild(renderRankRow(user)));
-        fragment.appendChild(list);
-      }
+const label = createTextElement('p', 'section-label', 'อันดับคะแนนสะสม');
+fragment.appendChild(label);                        // ← label ขึ้นมาก่อน
+
+fragment.appendChild(renderLeader(result.ranking[0]));
+
+if (result.ranking.length > 1) {
+  const list = document.createElement('div');
+  list.className = 'ranking-list';
+  result.ranking.slice(1).forEach(user => list.appendChild(renderRankRow(user)));
+  fragment.appendChild(list);
+}
 
       const note = document.createElement('div');
       note.className = 'ranking-note';
