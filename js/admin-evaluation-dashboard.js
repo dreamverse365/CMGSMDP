@@ -39,7 +39,7 @@
       '.aed-select{min-width:230px}',
       '.aed-refresh{cursor:pointer;color:#fff;background:var(--brand,#ba2b2b);border-color:var(--brand,#ba2b2b);font-weight:600}',
       '.aed-refresh:disabled{opacity:.55;cursor:wait}',
-      '.aed-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}',
+      '.aed-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}',
       '.aed-kpi,.aed-panel{background:#fff;border:1px solid var(--border,rgba(25,25,25,.09));border-radius:16px;box-shadow:0 7px 24px rgba(25,25,25,.045)}',
       '.aed-kpi{padding:16px}',
       '.aed-kpi-label{color:var(--text-3,#999);font-size:10px;font-weight:700;letter-spacing:.06em}',
@@ -68,6 +68,7 @@
       '.aed-comment{max-width:430px;white-space:normal}',
       '.aed-empty,.aed-error{padding:34px 16px;text-align:center;color:var(--text-3,#999);font-size:12px}',
       '.aed-error{color:var(--brand,#ba2b2b);background:rgba(186,43,43,.05);border-radius:12px}',
+      '@media(max-width:1100px){.aed-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}',
       '@media(max-width:900px){.aed-grid{grid-template-columns:1fr}.aed-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}',
       '@media(max-width:560px){.aed-head{align-items:stretch;flex-direction:column}.aed-controls{display:grid}.aed-select{min-width:0;width:100%}.aed-kpis{grid-template-columns:1fr 1fr}.aed-kpi{padding:13px}.aed-kpi-value{font-size:21px}}'
     ].join('');
@@ -104,8 +105,7 @@
   function renderCourseComparison(courses) {
     if (!courses.length) return '<div class="aed-empty">ยังไม่มีข้อมูลการประเมิน</div>';
     return '<div class="aed-course-list">' + courses.map(function (course) {
-      var score = course.avgRating5 != null ? formatNumber(course.avgRating5, 2) + '/5' :
-        (course.avgRating10 != null ? formatNumber(course.avgRating10, 2) + '/10' : '—');
+      var score = course.satisfactionPercent != null ? formatNumber(course.satisfactionPercent, 1) + '%' : '—';
       return '<div class="aed-course"><div class="aed-course-top"><span class="aed-course-name">' +
         escapeHtml(course.courseId + ' — ' + course.courseName) + '</span><span class="aed-course-score">' + score + '</span></div>' +
         '<div class="aed-course-meta">ผู้ตอบ ' + formatNumber(course.respondents) + ' คน · Response Rate ' +
@@ -150,11 +150,12 @@
       '<div class="aed-kpis">' +
         kpi(selectedAll ? 'UNIQUE RESPONDENTS' : 'RESPONDENTS', formatNumber(summary.respondents), 'คน') +
         kpi('SUBMISSIONS', formatNumber(summary.submissions), 'รายการ') +
+        kpi('OVERALL SATISFACTION', formatNumber(summary.satisfactionPercent, 1), summary.satisfactionPercent == null ? '' : '%') +
         kpi('AVG RATING 1–5', formatNumber(summary.avgRating5, 2), summary.avgRating5 == null ? '' : '/ 5') +
         kpi('AVG RATING 0–10', formatNumber(summary.avgRating10, 2), summary.avgRating10 == null ? '' : '/ 10') +
       '</div>' +
       '<div class="aed-grid"><div class="aed-panel"><h3>' + (selectedAll ? 'เปรียบเทียบแต่ละหลักสูตร' : 'คะแนนเฉลี่ยรายหัวข้อ') + '</h3>' +
-        '<p class="aed-panel-note">ข้อมูลอัปเดตจาก EvaluationResponses</p>' +
+        '<p class="aed-panel-note">ข้อมูลอัปเดตจาก EvaluationAnswers</p>' +
         (selectedAll ? renderCourseComparison(result.courses || []) : renderQuestionBars(result.questions || [])) + '</div>' +
         '<div class="aed-panel"><h3>ภาพรวมการตอบ</h3><p class="aed-panel-note">จำนวนผู้ตอบและความคิดเห็น</p>' +
           '<div class="aed-course-list">' +
