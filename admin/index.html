@@ -152,6 +152,37 @@
     .cancel { border:1px solid var(--border); background:var(--surface-2); color:var(--text-2); }
     .confirm { border:1px solid var(--brand); background:var(--brand); color:#fff; }
     button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline:2px solid var(--brand); outline-offset:2px; }
+
+    /* ── Course Assessment Summary ── */
+    .assess-section { margin-top: 16px; }
+    .assess-kpi-row { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin-bottom: 16px; }
+    .assess-kpi { padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2,#f5f5f5); }
+    .assess-kpi-label { font-size: 9px; font-weight: 700; letter-spacing: .08em; color: var(--text-3); }
+    .assess-kpi-val { margin-top: 6px; font: 800 22px/1 'Manrope'; color: var(--text); }
+    .assess-kpi-val.up { color: var(--success,#31865f); }
+    .assess-kpi-val.alert { color: var(--brand,#ba2b2b); }
+    .assess-course-grid { display: grid; gap: 10px; }
+    .assess-course-row { display: grid; grid-template-columns: 88px 1fr auto; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
+    .assess-course-id { font: 700 11px/1 'Manrope'; color: var(--text); }
+    .assess-course-name { font-size: 10px; color: var(--text-3); margin-top: 2px; }
+    .assess-bars { display: grid; gap: 5px; }
+    .assess-bar-row { display: flex; align-items: center; gap: 8px; }
+    .assess-bar-label { font-size: 9px; font-weight: 700; color: var(--text-3); width: 28px; flex-shrink: 0; }
+    .assess-bar-track { flex: 1; height: 7px; background: var(--border,#e8e8e8); border-radius: 99px; overflow: hidden; }
+    .assess-bar-fill { height: 100%; border-radius: 99px; transition: width .6s ease; }
+    .assess-bar-fill.pre { background: #b9bec5; }
+    .assess-bar-fill.post { background: var(--brand,#ba2b2b); }
+    .assess-bar-pct { font-size: 9px; font-weight: 700; color: var(--text-2); width: 32px; text-align: right; flex-shrink: 0; }
+    .assess-right { text-align: right; min-width: 64px; }
+    .assess-delta { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 99px; font: 700 11px/1 'Manrope'; }
+    .assess-delta.positive { color: var(--success,#31865f); background: rgba(49,134,95,.1); }
+    .assess-delta.negative { color: var(--brand,#ba2b2b); background: rgba(186,43,43,.1); }
+    .assess-delta.neutral { color: var(--text-3); background: var(--surface-2,#f5f5f5); }
+    .assess-count { font-size: 9px; color: var(--text-3); margin-top: 4px; }
+    .assess-pass-badge { display: flex; align-items: center; gap: 5px; margin-top: 5px; justify-content: flex-end; font-size: 9px; font-weight: 700; color: var(--text-3); }
+    .assess-pass-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success,#31865f); }
+    .assess-empty { padding: 32px 16px; text-align: center; color: var(--text-3); font-size: 12px; border: 1px dashed var(--border); border-radius: 12px; }
+
     @media(max-width:900px) {
       :root { --admin-sidebar: 0px; }
       .sidebar { position:static; width:100%; padding:14px; border-right:0; border-bottom:1px solid var(--border); }
@@ -166,11 +197,15 @@
       .module-grid { grid-template-columns:1fr 1fr; }
       .qr-grid { grid-template-columns:1fr; }
       .dashboard-grid { grid-template-columns:1fr; }
+      .assess-kpi-row { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .assess-course-row { grid-template-columns:1fr auto; }
+      .assess-course-id-wrap { grid-column: 1/-1; }
     }
     @media(max-width:540px) {
       .operator label { display:none; }
       .operator input { width:140px; }
       .stat-grid, .module-grid { grid-template-columns:1fr; }
+      .assess-kpi-row { grid-template-columns:1fr 1fr; }
     }
   </style>
 </head>
@@ -205,6 +240,33 @@
             <div class="chart-card"><div class="eyebrow">LEARNING PERFORMANCE</div><h2>คะแนนเฉลี่ย Pre-test vs Post-test</h2><p class="panel-copy">แสดงค่าเฉลี่ยเป็นเปอร์เซ็นต์ของแต่ละหลักสูตร</p><div class="chart-wrap"><canvas id="testScoreChart" role="img" aria-label="กราฟเปรียบเทียบคะแนนเฉลี่ย Pre-test และ Post-test"></canvas></div></div>
             <div class="chart-card"><div class="eyebrow">REWARD STATUS</div><h2>สถานะการ Redeem</h2><p class="panel-copy">สัดส่วนรายการตามสถานะปัจจุบัน</p><div class="chart-wrap"><canvas id="redeemStatusChart" role="img" aria-label="กราฟสถานะการแลกรางวัล"></canvas></div></div>
           </div>
+
+          <!-- ── COURSE ASSESSMENT SUMMARY (ใหม่) ── -->
+          <div class="chart-card assess-section" id="assessSection" style="margin-top:16px">
+            <div class="bulk-head">
+              <div>
+                <div class="eyebrow">COURSE ASSESSMENT</div>
+                <h2>สรุปผลการประเมินรายหลักสูตร</h2>
+                <p class="panel-copy">เปรียบเทียบคะแนนเฉลี่ย Pre / Post-test พร้อมพัฒนาการและจำนวนผู้เข้าสอบ</p>
+              </div>
+              <button class="refresh-btn" id="assessRefresh" type="button">รีเฟรช</button>
+            </div>
+
+            <!-- KPI row -->
+            <div class="assess-kpi-row" id="assessKpi">
+              <div class="assess-kpi"><div class="assess-kpi-label">หลักสูตรทั้งหมด</div><div class="assess-kpi-val" id="assessKpiCourses">—</div></div>
+              <div class="assess-kpi"><div class="assess-kpi-label">ผู้ทำ Post-test รวม</div><div class="assess-kpi-val" id="assessKpiTakers">—</div></div>
+              <div class="assess-kpi"><div class="assess-kpi-label">พัฒนาการเฉลี่ย</div><div class="assess-kpi-val up" id="assessKpiImprove">—</div></div>
+              <div class="assess-kpi"><div class="assess-kpi-label">ผ่านเกณฑ์ 70% (Post)</div><div class="assess-kpi-val" id="assessKpiPass">—</div></div>
+            </div>
+
+            <!-- Per-course rows -->
+            <div class="assess-course-grid" id="assessCourseGrid">
+              <div class="assess-empty">กำลังโหลด...</div>
+            </div>
+          </div>
+          <!-- ── END COURSE ASSESSMENT SUMMARY ── -->
+
           <div class="chart-card dashboard-ranking"><div class="bulk-head"><div><div class="eyebrow">LEADERBOARD</div><h2>Ranking Top 5</h2><p class="panel-copy">อันดับจาก Total Point โดยไม่หักคะแนนหลัง Redeem</p></div><button class="refresh-btn" id="dashboardRefresh" type="button">รีเฟรช</button></div><div class="table-wrap" style="margin-top:14px"><table style="min-width:680px"><thead><tr><th>RANK</th><th>EMPLOYEE</th><th>BRAND</th><th>LOCATION</th><th>TOTAL POINT</th></tr></thead><tbody id="dashboardTopRows"><tr><td colspan="5" class="empty">กำลังโหลด...</td></tr></tbody></table></div></div>
         </section>
 
@@ -360,18 +422,127 @@
       renderDashboard(); renderRedeems(); renderRanking(); fillRankingBrands();
       if(!redeemResult.success) showToast(redeemResult.message||'โหลด Redeem Log ไม่สำเร็จ','error');
     }
+
     function renderDashboard(){
       document.getElementById('statUsers').textContent=users.length.toLocaleString('th-TH');
       document.getElementById('statTotalPoints').textContent=users.reduce((sum,x)=>sum+n(x.totalPoint),0).toLocaleString('th-TH');
       document.getElementById('statPending').textContent=redeems.filter(x=>statusOf(x.Status).key==='PENDING').length.toLocaleString('th-TH');
       document.getElementById('statStock').textContent=rewards.reduce((sum,x)=>sum+n(x.RemainingQty),0).toLocaleString('th-TH');
-      renderDashboardCharts();renderDashboardTop5();
+      renderDashboardCharts();
+      renderCourseAssessment();
+      renderDashboardTop5();
     }
+
     function renderDashboardCharts(){
       if(typeof Chart==='undefined')return;const rows=dashboardAnalytics.courseTests||[];const labels=rows.map(x=>x.courseId);const common={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{usePointStyle:true,boxWidth:8,font:{family:'Inter'}}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y}%`}}},scales:{y:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'},grid:{color:'rgba(25,25,25,.06)'}},x:{grid:{display:false}}}};
       if(testScoreChart)testScoreChart.destroy();testScoreChart=new Chart(document.getElementById('testScoreChart'),{type:'bar',data:{labels,datasets:[{label:'Pre-test',data:rows.map(x=>x.preAverage),backgroundColor:'#b9bec5',borderRadius:6},{label:'Post-test',data:rows.map(x=>x.postAverage),backgroundColor:'#ba2b2b',borderRadius:6}]},options:common});
       const statusKeys=['PENDING','APPROVED','DELIVERED','REJECTED'];const counts=statusKeys.map(key=>redeems.filter(x=>statusOf(x.Status).key===key).length);if(redeemStatusChart)redeemStatusChart.destroy();redeemStatusChart=new Chart(document.getElementById('redeemStatusChart'),{type:'doughnut',data:{labels:['รอตรวจสอบ','อนุมัติแล้ว','ส่งมอบแล้ว','ยกเลิก'],datasets:[{data:counts,backgroundColor:['#c9a84c','#547ba5','#31865f','#ba2b2b'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8,padding:16,font:{family:'Prompt'}}}}}});
     }
+
+    /* ── NEW: Course Assessment Summary ── */
+    function renderCourseAssessment() {
+      const rows = (dashboardAnalytics.courseTests || []);
+      const grid = document.getElementById('assessCourseGrid');
+
+      if (!rows.length) {
+        grid.innerHTML = '<div class="assess-empty">ยังไม่มีข้อมูลการประเมินหลักสูตร</div>';
+        document.getElementById('assessKpiCourses').textContent = '0';
+        document.getElementById('assessKpiTakers').textContent = '0';
+        document.getElementById('assessKpiImprove').textContent = '—';
+        document.getElementById('assessKpiPass').textContent = '—';
+        return;
+      }
+
+      // KPI aggregates
+      const totalTakers = rows.reduce((s, x) => s + n(x.postCount || x.preCount), 0);
+      const avgImprove = rows.reduce((s, x) => s + (n(x.postAverage) - n(x.preAverage)), 0) / rows.length;
+      // weighted average pass rate (use passRate field if present, else estimate from postAverage)
+      const passRates = rows.map(x => x.passRate != null ? n(x.passRate) : (n(x.postAverage) >= 70 ? 100 : 0));
+      const avgPassRate = passRates.reduce((s, v) => s + v, 0) / rows.length;
+
+      document.getElementById('assessKpiCourses').textContent = rows.length;
+      document.getElementById('assessKpiTakers').textContent = totalTakers.toLocaleString('th-TH');
+      const improveEl = document.getElementById('assessKpiImprove');
+      improveEl.textContent = (avgImprove >= 0 ? '+' : '') + avgImprove.toFixed(1) + '%';
+      improveEl.className = 'assess-kpi-val ' + (avgImprove > 0 ? 'up' : avgImprove < 0 ? 'alert' : '');
+      document.getElementById('assessKpiPass').textContent = avgPassRate.toFixed(1) + '%';
+
+      // Per-course rows
+      grid.replaceChildren();
+      rows.forEach(item => {
+        const pre = n(item.preAverage);
+        const post = n(item.postAverage);
+        const delta = post - pre;
+        const postCount = n(item.postCount || item.preCount);
+        const passRate = item.passRate != null ? n(item.passRate) : null;
+
+        const row = document.createElement('div');
+        row.className = 'assess-course-row';
+
+        // Left: course ID + name
+        const left = document.createElement('div');
+        const idEl = document.createElement('div');
+        idEl.className = 'assess-course-id';
+        idEl.textContent = item.courseId || '—';
+        const nameEl = document.createElement('div');
+        nameEl.className = 'assess-course-name';
+        nameEl.textContent = item.courseName || '';
+        left.append(idEl, nameEl);
+
+        // Center: dual progress bars
+        const center = document.createElement('div');
+        center.className = 'assess-bars';
+
+        [['PRE', pre, 'pre'], ['POST', post, 'post']].forEach(([label, pct, cls]) => {
+          const barRow = document.createElement('div');
+          barRow.className = 'assess-bar-row';
+          const lbl = document.createElement('span');
+          lbl.className = 'assess-bar-label';
+          lbl.textContent = label;
+          const track = document.createElement('div');
+          track.className = 'assess-bar-track';
+          const fill = document.createElement('div');
+          fill.className = `assess-bar-fill ${cls}`;
+          fill.style.width = '0%';
+          // Animate after paint
+          requestAnimationFrame(() => { requestAnimationFrame(() => { fill.style.width = Math.min(100, pct) + '%'; }); });
+          track.appendChild(fill);
+          const pctLabel = document.createElement('span');
+          pctLabel.className = 'assess-bar-pct';
+          pctLabel.textContent = pct.toFixed(1) + '%';
+          barRow.append(lbl, track, pctLabel);
+          center.appendChild(barRow);
+        });
+
+        // Right: delta badge + takers + pass rate
+        const right = document.createElement('div');
+        right.className = 'assess-right';
+
+        const deltaBadge = document.createElement('span');
+        deltaBadge.className = 'assess-delta ' + (delta > 0 ? 'positive' : delta < 0 ? 'negative' : 'neutral');
+        deltaBadge.innerHTML = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="${delta >= 0 ? 'M5 8V2M2 5l3-3 3 3' : 'M5 2v6M2 5l3 3 3-3'}" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>${(delta >= 0 ? '+' : '')}${delta.toFixed(1)}%`;
+
+        const countEl = document.createElement('div');
+        countEl.className = 'assess-count';
+        countEl.textContent = `${postCount.toLocaleString('th-TH')} คน`;
+
+        right.append(deltaBadge, countEl);
+
+        if (passRate != null) {
+          const passEl = document.createElement('div');
+          passEl.className = 'assess-pass-badge';
+          const dot = document.createElement('span');
+          dot.className = 'assess-pass-dot';
+          passEl.append(dot, `ผ่าน ${passRate.toFixed(1)}%`);
+          right.appendChild(passEl);
+        }
+
+        row.append(left, center, right);
+        grid.appendChild(row);
+      });
+    }
+    /* ── END NEW ── */
+
     function renderDashboardTop5(){const body=document.getElementById('dashboardTopRows');body.replaceChildren();const list=rankings.slice(0,5);if(!list.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=5;td.className='empty';td.textContent='ยังไม่มีข้อมูล Ranking';tr.appendChild(td);body.appendChild(tr);return;}list.forEach(item=>{const tr=document.createElement('tr'),rankTd=document.createElement('td'),rank=document.createElement('span');rank.className=`rank-no ${item.rank<=3?'top-'+item.rank:''}`;rank.textContent=item.rank;rankTd.appendChild(rank);tr.appendChild(rankTd);const employee=document.createElement('td');employee.className='primary-cell';employee.textContent=`${item.empId}\n${item.firstname||''} ${item.lastname||''}`;employee.style.whiteSpace='pre-line';tr.appendChild(employee);[item.brandName||'—',item.workLocation||'—'].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td);});const total=document.createElement('td');total.className='rank-point';total.textContent=n(item.totalPoint).toLocaleString('th-TH');tr.appendChild(total);body.appendChild(tr);});}
     function filteredRedeems(){
       const q=document.getElementById('searchInput').value.trim().toLowerCase();
@@ -654,6 +825,7 @@
     document.getElementById('reportRefresh').addEventListener('click',async()=>{await loadAll();renderUserReports();});
     document.getElementById('exportExcelBtn').addEventListener('click',exportExcel);
     document.getElementById('dashboardRefresh').addEventListener('click',loadAll);
+    document.getElementById('assessRefresh').addEventListener('click',loadAll);
     document.getElementById('actionModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
     loadAll();
   </script>
