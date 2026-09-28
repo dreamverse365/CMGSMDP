@@ -236,21 +236,27 @@
             <div class="stat-card is-alert"><div class="stat-label">PENDING REDEEM</div><div class="stat-value" id="statPending">—</div></div>
             <div class="stat-card"><div class="stat-label">REWARD STOCK</div><div class="stat-value" id="statStock">—</div></div>
           </div>
-          <div class="dashboard-grid">
-            <div class="chart-card"><div class="eyebrow">LEARNING PERFORMANCE</div><h2>คะแนนเฉลี่ย Pre-test vs Post-test</h2><p class="panel-copy">แสดงค่าเฉลี่ยเป็นเปอร์เซ็นต์ของแต่ละหลักสูตร</p><div class="chart-wrap"><canvas id="testScoreChart" role="img" aria-label="กราฟเปรียบเทียบคะแนนเฉลี่ย Pre-test และ Post-test"></canvas></div></div>
-            <div class="chart-card"><div class="eyebrow">REWARD STATUS</div><h2>สถานะการ Redeem</h2><p class="panel-copy">สัดส่วนรายการตามสถานะปัจจุบัน</p><div class="chart-wrap"><canvas id="redeemStatusChart" role="img" aria-label="กราฟสถานะการแลกรางวัล"></canvas></div></div>
-          </div>
+          <div class="dashboard-grid" style="grid-template-columns: minmax(0,1fr);">
+  <div class="chart-card">
+    <div class="eyebrow">REWARD STATUS</div>
+    <h2>สถานะการ Redeem</h2>
+    <p class="panel-copy">สัดส่วนรายการตามสถานะปัจจุบัน</p>
+    <div class="chart-wrap">
+      <canvas id="redeemStatusChart" role="img" aria-label="กราฟสถานะการแลกรางวัล"></canvas>
+    </div>
+  </div>
+</div>
 
           <!-- ── COURSE ASSESSMENT SUMMARY (ใหม่) ── -->
           <div class="chart-card assess-section" id="assessSection" style="margin-top:16px">
-            <div class="bulk-head">
-              <div>
-                <div class="eyebrow">COURSE ASSESSMENT</div>
-                <h2>สรุปผลการประเมินรายหลักสูตร</h2>
-                <p class="panel-copy">เปรียบเทียบคะแนนเฉลี่ย Pre / Post-test พร้อมพัฒนาการและจำนวนผู้เข้าสอบ</p>
-              </div>
-              <button class="refresh-btn" id="assessRefresh" type="button">รีเฟรช</button>
-            </div>
+  <div class="bulk-head">
+    <div>
+      <div class="eyebrow">LEARNING PERFORMANCE</div>
+      <h2>คะแนนเฉลี่ย Pre-test vs Post-test รายหลักสูตร</h2>
+      <p class="panel-copy">เปรียบเทียบคะแนนเฉลี่ย Pre / Post-test พร้อมพัฒนาการและจำนวนผู้เข้าสอบ</p>
+    </div>
+    <button class="refresh-btn" id="assessRefresh" type="button">รีเฟรช</button>
+  </div>
 
             <!-- KPI row -->
             <div class="assess-kpi-row" id="assessKpi">
@@ -400,7 +406,7 @@
 <script src="../js/admin-evaluation-dashboard.js?v=2"></script>
   <script>
     const ADMIN_NAME_KEY = 'cmg_admin_operator';
-    let users = [], rewards = [], redeems = [], rankings = [], courses = [], questions = [], testResults = [], dashboardAnalytics = {courseTests:[]}, testScoreChart = null, redeemStatusChart = null, coursesLoaded = false, testsLoaded = false, rewardsManagedLoaded = false, editingCourseId = '', editingQuestionKey = '', editingRewardId = '', selected = null, selectedStatus = '', saving = false, lastQr = null, pointUser = null, bulkPreviewData = null;
+    let users = [], rewards = [], redeems = [], rankings = [], courses = [], questions = [], testResults = [], dashboardAnalytics = {courseTests:[]}, redeemStatusChart = null, coursesLoaded = false, testsLoaded = false, rewardsManagedLoaded = false, editingCourseId = '', editingQuestionKey = '', editingRewardId = '', selected = null, selectedStatus = '', saving = false, lastQr = null, pointUser = null, bulkPreviewData = null;
     const statusMap = {
       PENDING: { label:'รอตรวจสอบ', cls:'pending' }, APPROVED:{ label:'อนุมัติแล้ว', cls:'approved' },
       DELIVERED:{ label:'ส่งมอบแล้ว', cls:'delivered' }, REJECTED:{ label:'ยกเลิก', cls:'rejected' }
@@ -435,10 +441,28 @@
     }
 
     function renderDashboardCharts(){
-      if(typeof Chart==='undefined')return;const rows=dashboardAnalytics.courseTests||[];const labels=rows.map(x=>x.courseId);const common={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{usePointStyle:true,boxWidth:8,font:{family:'Inter'}}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y}%`}}},scales:{y:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'},grid:{color:'rgba(25,25,25,.06)'}},x:{grid:{display:false}}}};
-      if(testScoreChart)testScoreChart.destroy();testScoreChart=new Chart(document.getElementById('testScoreChart'),{type:'bar',data:{labels,datasets:[{label:'Pre-test',data:rows.map(x=>x.preAverage),backgroundColor:'#b9bec5',borderRadius:6},{label:'Post-test',data:rows.map(x=>x.postAverage),backgroundColor:'#ba2b2b',borderRadius:6}]},options:common});
-      const statusKeys=['PENDING','APPROVED','DELIVERED','REJECTED'];const counts=statusKeys.map(key=>redeems.filter(x=>statusOf(x.Status).key===key).length);if(redeemStatusChart)redeemStatusChart.destroy();redeemStatusChart=new Chart(document.getElementById('redeemStatusChart'),{type:'doughnut',data:{labels:['รอตรวจสอบ','อนุมัติแล้ว','ส่งมอบแล้ว','ยกเลิก'],datasets:[{data:counts,backgroundColor:['#c9a84c','#547ba5','#31865f','#ba2b2b'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8,padding:16,font:{family:'Prompt'}}}}}});
+  if(typeof Chart==='undefined') return;
+  
+  // Redeem doughnut เท่านั้น
+  const statusKeys = ['PENDING','APPROVED','DELIVERED','REJECTED'];
+  const counts = statusKeys.map(key => redeems.filter(x => statusOf(x.Status).key === key).length);
+  if(redeemStatusChart) redeemStatusChart.destroy();
+  redeemStatusChart = new Chart(document.getElementById('redeemStatusChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['รอตรวจสอบ','อนุมัติแล้ว','ส่งมอบแล้ว','ยกเลิก'],
+      datasets: [{
+        data: counts,
+        backgroundColor: ['#c9a84c','#547ba5','#31865f','#ba2b2b'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '66%',
+      plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, padding: 16, font: { family: 'Prompt' } } } }
     }
+  });
+}
 
     /* ── NEW: Course Assessment Summary ── */
     function renderCourseAssessment() {
