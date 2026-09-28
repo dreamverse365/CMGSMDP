@@ -397,6 +397,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="../js/config.js"></script>
+<script src="../js/admin-evaluation-dashboard.js?v=1"></script>
   <script>
     const ADMIN_NAME_KEY = 'cmg_admin_operator';
     let users = [], rewards = [], redeems = [], rankings = [], courses = [], questions = [], testResults = [], dashboardAnalytics = {courseTests:[]}, testScoreChart = null, redeemStatusChart = null, coursesLoaded = false, testsLoaded = false, rewardsManagedLoaded = false, editingCourseId = '', editingQuestionKey = '', editingRewardId = '', selected = null, selectedStatus = '', saving = false, lastQr = null, pointUser = null, bulkPreviewData = null;
@@ -829,5 +830,6 @@
     document.getElementById('actionModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
     loadAll();
   </script>
+  
 </body>
 </html>
