@@ -124,13 +124,31 @@
   }
 
   function renderComments(comments) {
-    if (!comments.length) return '<div class="aed-empty">ยังไม่มีความคิดเห็นแบบข้อความ</div>';
-    return '<div class="aed-table-wrap"><table class="aed-table"><thead><tr><th>หลักสูตร</th><th>EMPLOYEE</th><th>หัวข้อ</th><th>ความคิดเห็น</th><th>วันที่</th></tr></thead><tbody>' +
-      comments.map(function (item) {
-        return '<tr><td>' + escapeHtml(item.courseId) + '</td><td>' + escapeHtml(item.empId || '—') + '</td><td>' +
-          escapeHtml(item.question) + '</td><td class="aed-comment">' + escapeHtml(item.answer) + '</td><td>' + formatDate(item.submittedAt) + '</td></tr>';
-      }).join('') + '</tbody></table></div>';
-  }
+  if (!comments.length) return '<div class="aed-empty">ยังไม่มีความคิดเห็นแบบข้อความ</div>';
+
+  // จัดกลุ่มตาม courseId
+  var grouped = {};
+  comments.forEach(function (item) {
+    var key = item.courseId || '—';
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(item);
+  });
+
+  return '<div class="aed-course-list">' +
+    Object.keys(grouped).map(function (courseId) {
+      var items = grouped[courseId];
+      var answers = items.map(function (item) {
+        return '<li style="margin:4px 0;color:var(--text-2,#666);font-size:10px;line-height:1.6">' +
+          escapeHtml(item.answer) + '</li>';
+      }).join('');
+      return '<div class="aed-course">' +
+        '<div class="aed-course-name" style="margin-bottom:8px">' + escapeHtml(courseId) + 
+        ' <span style="color:var(--text-3);font-weight:400;font-size:9px">(' + items.length + ' ความคิดเห็น)</span></div>' +
+        '<ul style="margin:0;padding-left:16px">' + answers + '</ul>' +
+      '</div>';
+    }).join('') +
+  '</div>';
+}
 
   function updateCourseOptions(courses) {
     var select = document.getElementById('aedCourse');
