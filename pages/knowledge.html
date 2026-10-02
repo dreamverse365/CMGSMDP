@@ -86,6 +86,7 @@
       margin-top: 3px; color: var(--text-3);
       font-size: 11px; line-height: 1.55;
     }
+    .knowledge-desc:empty { display: none; }
     .knowledge-meta {
       display: flex; flex-wrap: wrap;
       gap: 6px; margin-top: 8px;
@@ -205,6 +206,28 @@
       } catch (_) { return ''; }
     }
 
+    // แปลงค่าวันที่ (ISO string / Date) ให้เหลือแค่วัน-เดือน-ปี ตามเวลาไทย เช่น 2 Oct 2026
+    // เปลี่ยน 'en-GB' เป็น 'th-TH' ถ้าต้องการแบบไทย (2 ต.ค. 2569)
+    function formatDate(value, withYear = true) {
+      if (!value) return '';
+      const d = new Date(value);
+      if (isNaN(d)) return String(value);   // ไม่ใช่วันที่ ให้แสดงตามเดิม
+      return d.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        ...(withYear ? { year: 'numeric' } : {}),
+        timeZone: 'Asia/Bangkok'
+      });
+    }
+
+    // Description (คอลัมน์ C) ใน Sheet เป็นชนิดวันที่ จึงอาจถูกส่งมาเป็น ISO string เช่น 25 Sep
+    function formatDesc(value) {
+      if (!value) return '';
+      return /^\d{4}-\d{2}-\d{2}T/.test(String(value))
+        ? formatDate(value, false)
+        : String(value);
+    }
+
     function fillCategories() {
       const select = document.getElementById('categoryFilter');
       [...new Set(knowledge.map(x => String(x.Category || '').trim()).filter(Boolean))]
@@ -217,7 +240,7 @@
       const category = document.getElementById('categoryFilter').value;
       const list = knowledge.filter(x =>
         (category === 'ALL' || String(x.Category) === category) &&
-        (!q || [x.Title, x.Description, x.Category].join(' ').toLowerCase().includes(q))
+        (!q || [x.Title, formatDesc(x.Description), x.KnowledgeID, x.Category].join(' ').toLowerCase().includes(q))
       );
       const box = document.getElementById('knowledgeList');
       box.replaceChildren();
@@ -251,10 +274,14 @@
             </svg>
           </div>`;
         card.querySelector('.knowledge-item-title').textContent = item.Title || 'Untitled';
-        card.querySelector('.knowledge-desc').textContent = item.Description || '';
+        card.querySelector('.knowledge-desc').textContent = formatDesc(item.Description);
+
         const tags = card.querySelectorAll('.knowledge-tag');
-        tags[0].textContent = item.Category || 'General';
-        tags[1].textContent = item.FileType || 'File';
+        tags[0].textContent = item.KnowledgeID || '-';                 // คอลัมน์ A
+        const updated = formatDate(item.UpdatedDate);                  // คอลัมน์ J
+        if (updated) tags[1].textContent = 'อัปเดต ' + updated;
+        else tags[1].remove();
+
         box.appendChild(card);
       });
     }
